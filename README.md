@@ -42,7 +42,7 @@ Versioner.Cli.exe
 
 **-e** : Version NuSPEC files within working directory structure **even** if there are other project type files available (ex. CSPROJ). Without the parameter set, if there are any other than NuSPEC project files available - no custom NuSPEC versioning shall be achieved.
 
-**-v=** [int] : Semantic Versioning Format: may be 1 or 2. V1 consists of four versioning positions (ex. A.B.C.D), V2 consists of three (A.B.C).
+**-v=** [int] : Semantic Versioning Format: may be 1 or 2. V1 consists of four versioning positions (ex. A.B.C.D), V2 consists of three (A.B.C). *Default is V1*.
 
 #### Monorepo Mode
 
