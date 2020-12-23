@@ -74,7 +74,7 @@ Versioner outputs 2 environment variables, which can be used for further version
 
 ### Example command line usage
 ```
-dotnet Versioner.Cli.dll -w:"C:\TEMP\PROJECT1REPO" -d -s -l I -g -f:"C:\TEMP\ProjectGuids.json" -u:"C:\TEMP\CustomProjectSettings.json"
+dotnet Versioner.Cli.dll -w="C:\TEMP\PROJECT1REPO" -d -s -l I -g -f="C:\TEMP\ProjectGuids.json" -u="C:\TEMP\CustomProjectSettings.json"
 ```
 
 ### Example configuration files
