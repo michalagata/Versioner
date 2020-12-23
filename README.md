@@ -77,7 +77,7 @@ dotnet Versioner.Cli.dll -w:"C:\TEMP\PROJECT1REPO" -d -s -l I -g -f:"C:\TEMP\Pro
 
 ### Example configuration files
 
-[^1]: CustomPrjectSettingsExample.json
+[^1]: CustomProjectSettingsExample.json
 ```
 {
     ProjectSettings: [
