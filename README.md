@@ -66,7 +66,7 @@ It is possible to override Minor + Major versioning base. Just commit into repo 
 
 ### Environment variable output (may be used on CI level - ex. TeamCity)
 
-Versioner outputs 2 variables, which can be used for further versioning needs:
+Versioner outputs 2 environment variables, which can be used for further versioning needs:
 
 - env.BuildLabel → typo + Commit Hash
 - env.DockerBuildLabel → Dock SemVer (X.Y.Z)
