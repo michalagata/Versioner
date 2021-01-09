@@ -70,6 +70,7 @@ Versioner outputs 2 environment variables, which can be used for further version
 
 - env.BuildLabel → typo + Commit Hash
 - env.DockerBuildLabel → Dock SemVer (X.Y.Z)
+- env.BuildNuspecVersion → NuSpec SemVer (wither X.Y.Z.W or X.Y.Z)
 
 
 ### Example command line usage
