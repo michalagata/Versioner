@@ -58,6 +58,8 @@ It contains three functionalities:
 
 **-p=** [string] : Points directly to CSPROJ file, which shall be used as base for versioning.
 
+**-x=** [string] : Set prerelease version, adding defined suffix to calculated SemVer.
+
 
 ### Versioning override file
 
@@ -71,8 +73,6 @@ Versioner outputs 2 environment variables, which can be used for further version
 - env.BuildLabel → typo + Commit Hash
 - env.DockerBuildLabel → Dock SemVer (X.Y.Z)
 - env.BuildNuspecVersion → NuSpec SemVer (wither X.Y.Z.W or X.Y.Z)
-- env.ArtifactVersion → package SemVer (wither X.Y.Z.W or X.Y.Z)
-- env.allBuildLabel → shared calculated version for all files within MonoRepo
 
 
 ### Example command line usage
@@ -111,5 +111,16 @@ dotnet Versioner.Cli.dll -w="C:\TEMP\PROJECT1REPO" -d -s -l I -g -f="C:\TEMP\Pro
 {
 "Major": 1,
 "Minor": 4
+}
+```
+
+or
+
+```
+{
+"Major": 1,
+"Minor": 4,
+"Patch": 0,
+"Hotfix": 0
 }
 ```
