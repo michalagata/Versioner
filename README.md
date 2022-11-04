@@ -52,7 +52,7 @@ It contains three functionalities:
 
 **-m** : Monorepo mode, if set blank (no additional parameters) - shall search working directory for SLN file and based on VS2017+ standard) - point first project file (CSPROJ), which should be base for monorepo versioning.
 
-##### Additional p[arameters follow
+##### Additional parameters follow
 
 **-a** : alters SLN search criterias, not only running through the working directory (top level), but also subdirectories. First found shall be parsed.
 
@@ -73,6 +73,8 @@ Versioner outputs 2 environment variables, which can be used for further version
 - env.BuildLabel → typo + Commit Hash
 - env.DockerBuildLabel → Dock SemVer (X.Y.Z)
 - env.BuildNuspecVersion → NuSpec SemVer (wither X.Y.Z.W or X.Y.Z)
+- env.ArtifactVersion → package SemVer (wither X.Y.Z.W or X.Y.Z)
+- env.allBuildLabel → shared calculated version for all files within MonoRepo
 
 
 ### Example command line usage
