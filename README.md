@@ -44,21 +44,23 @@ Versioner.Cli.exe
 
 **-v=** [int] : Semantic Versioning Format: may be 1 or 2. V1 consists of four versioning positions (ex. A.B.C.D), V2 consists of three (A.B.C). *Default is V1*.
 
+**-x=** [string] : Set prerelease version, adding defined suffix to calculated SemVer.
+
+**-z=** [string] : Static setting last unit of Semantic Versioning mask (aka Patch) to defined one. Will override all components versioning, no matter whether single or mono repo mode.
+
 #### Monorepo Mode
 
 In Monorepo mode, single pointed is the versioning base, while the rest of version-qualified components shall gain the exact same version as the base file.
 
 It contains three functionalities:
 
-**-m** : Monorepo mode, if set blank (no additional parameters) - shall search working directory for SLN file and based on VS2017+ standard) - point first project file (CSPROJ), which should be base for monorepo versioning.
+**-m** : Monorepo mode, if set blank (no additional parameters) - shall calculate version based on date and git log, calculated from WorkingDirectory level.
 
 ##### Additional parameters follow
 
-**-a** : alters SLN search criterias, not only running through the working directory (top level), but also subdirectories. First found shall be parsed.
+**-a** : alters SLN search criterias, not only running through the working directory (top level), but also subdirectories. First found shall be parsed and taken as base for monorepo versioning.
 
 **-p=** [string] : Points directly to CSPROJ file, which shall be used as base for versioning.
-
-**-x=** [string] : Set prerelease version, adding defined suffix to calculated SemVer.
 
 
 ### Versioning override file
@@ -75,6 +77,8 @@ Versioner outputs 2 environment variables, which can be used for further version
 - env.BuildNuspecVersion → NuSpec SemVer (wither X.Y.Z.W or X.Y.Z)
 - env.ArtifactVersion → package SemVer (wither X.Y.Z.W or X.Y.Z)
 - env.allBuildLabel → shared calculated version for all files within MonoRepo
+
+* Z may be overriden by -z=Z parameter
 
 
 ### Example command line usage
