@@ -78,7 +78,7 @@ Versioner outputs 2 environment variables, which can be used for further version
 - env.ArtifactVersion → package SemVer (wither X.Y.Z.W or X.Y.Z)
 - env.allBuildLabel → shared calculated version for all files within MonoRepo
 
-* Z may be overriden by -z=Z parameter
+[x] Z may be overriden by -z=Z parameter
 
 
 ### Example command line usage
