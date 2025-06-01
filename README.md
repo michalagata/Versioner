@@ -3,6 +3,7 @@
 ## Performs versiong of:
 - AssemblyInfo.cs
 - CSPROJ file (SDK)
+- Props file
 - NPM (package.json)
 - Docker
 - Custom NuSPEC (standalone)
@@ -61,6 +62,8 @@ It contains three functionalities:
 **-a** : alters SLN search criterias, not only running through the working directory (top level), but also subdirectories. First found shall be parsed and taken as base for monorepo versioning.
 
 **-p=** [string] : Points directly to CSPROJ file, which shall be used as base for versioning.
+
+**-n** : Should only .props file be identified for versioning if exists? Setting to false shall trat props along with project files.
 
 
 ### Versioning override file
