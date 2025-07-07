@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Versioner": {
+      "commandName": "Project",
+      "commandLineArgs": "-d -w=\"D:\\PROJECTS\\REPOSITORY\\NET\\CI\\DirCleaner\" -l=I -m"
+    }
+  }
+}

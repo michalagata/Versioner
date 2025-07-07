@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <!--<PublishTrimmed>false</PublishTrimmed>
+	<PublishReadyToRun>true</PublishReadyToRun>
+	<PublishSingleFile>false</PublishSingleFile>-->
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <Product>Versioner.Cli</Product>
+    <PackageId>Versioner.Cli</PackageId>
+    <AssemblyName>Versioner.Cli</AssemblyName>
+    <RootNamespace>AnubisWorks.Tools.Versioner.Cli</RootNamespace>
+    <ApplicationIcon>Resources\versioner.ico</ApplicationIcon>
+    <Authors>Michael Agata</Authors>
+    <Copyright>(c) 2016-$([System.DateTime]::Now.Year) Michael Agata, AnubisWorks</Copyright>
+    <Company>AnubisWorks</Company>
+    <OutputPath>..\DEPLOYMENT\</OutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Configurations>Debug;Release</Configurations>
+    <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+    <SignAssembly>false</SignAssembly>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\versioner.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\versioner.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ArgsInterceptor" Version="7.8.63.4" />
+    <!--<PackageReference Include="Microsoft.NETCore.App" Version="2.2.8" />-->
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Versioner.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Helper\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <Version>8.1.152.2+2c61d8b</Version>
+    <AssemblyVersion>8.1.152.2</AssemblyVersion>
+    <FileVersion>8.1.152.2</FileVersion>
+    <Description>ChangeHash:2c61d8b,BuildLabel:REV_20250601_1515_7052e7d</Description>
+  </PropertyGroup>
+</Project>

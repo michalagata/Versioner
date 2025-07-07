@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Product>Versioner</Product>
+    <PackageId>Versioner</PackageId>
+    <AssemblyName>Versioner</AssemblyName>
+    <RootNamespace>AnubisWorks.Tools.Versioner</RootNamespace>
+    <Authors>Michael Agata</Authors>
+    <Copyright>(c) 2016-$([System.DateTime]::Now.Year) Michael Agata, AnubisWorks</Copyright>
+    <Company>AnubisWorks</Company>
+    <OutputPath>..\DEPLOYMENT\</OutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Configurations>Debug;Release</Configurations>
+    <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+    <SignAssembly>false</SignAssembly>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Versioner.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Scripts\GitCalculate.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Scripts\GitVersion.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <Version>8.1.152.4+2c61d8b</Version>
+    <AssemblyVersion>8.1.152.4</AssemblyVersion>
+    <FileVersion>8.1.152.4</FileVersion>
+    <Description>ChangeHash:2c61d8b,BuildLabel:REV_20250601_1515_7052e7d</Description>
+  </PropertyGroup>
+</Project>

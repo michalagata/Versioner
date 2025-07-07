@@ -1,0 +1,18 @@
+{
+	ProjectSettings: [
+	{
+	"ProjectName": "TestProject",
+	"Directories": [
+		"Directory1",
+		"Directory2/SubDirectory1"
+		]
+		},
+		{
+		"ProjectName": "Data.Crawler",
+		"Directories": [
+		"DataInternal",
+		"Service/Data.Internal"
+		]
+		}
+	]
+}

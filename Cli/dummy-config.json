@@ -1,0 +1,14 @@
+{
+  "Default": {
+    "AssemblyInfoFile": "Properties/AssemblyInfo.cs",
+    "AssemblyInfoVersionSet": true,
+    "AssemblyInfoVersionFormat": "*.{0:00}.{1:00}.{2}",
+    "AssemblyVersionSet": true,
+    "AssemblyVersionFormat": "*.{0:00}.{1:00}.{2}",
+    "AssemblyFileVersionSet": true,
+    "AssemblyFileVersionFormat": "*.{0:00}.{1:00}.{2}+{3}",
+    "HashAsDescription": true
+  },
+  "Items": [
+  ]
+}
