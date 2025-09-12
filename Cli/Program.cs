@@ -137,7 +137,7 @@ namespace AnubisWorks.Tools.Versioner.Cli
                     p.Object.AllSlnLocations = false;
                 }
 
-                if (p.Object.SemVersion != 1 || p.Object.SemVersion != 2)
+                if (p.Object.SemVersion != 1 && p.Object.SemVersion != 2)
                 {
                     Console.WriteLine("Wrong value for semversion switch! Please use 1 or 2.");
                     Console.WriteLine($"Setting default SemVersion value = 1");

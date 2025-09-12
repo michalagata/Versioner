@@ -68,6 +68,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             else if (filePath.EndsWith(".props"))
             {
                 projectType = ProjectType.Props;
+                project = XDocument.Parse(File.ReadAllText(filePath));
             }
             else if (filePath.EndsWith("package.json"))
             {

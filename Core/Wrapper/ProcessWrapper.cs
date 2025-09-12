@@ -31,8 +31,10 @@ namespace AnubisWorks.Tools.Versioner
             //    if(!string.IsNullOrEmpty(workingDirectory)) p.StartInfo.WorkingDirectory = workingDirectory.ToLinuxPath();
             //}
 
-            bool started = p.Start();
-            if (started)
+            try
+            {
+                bool started = p.Start();
+                if (started)
             {
                 var waitForExitTask = Task.Factory.StartNew(() => { p.WaitForExit(); });
 
@@ -52,9 +54,18 @@ namespace AnubisWorks.Tools.Versioner
                 });
 
                 Task.WaitAll(readOutputTask, readErrortTask, waitForExitTask);
+                }
             }
-            sw.Stop();
-            log.Verbose("Process executed in {proces_elapsed_time} ms", sw.ElapsedMilliseconds);
+            catch (Exception ex)
+            {
+                log.Error(ex, "Failed to start process: {process_file_name} {process_args}", filePath, args);
+                serr = ex.Message;
+            }
+            finally
+            {
+                sw.Stop();
+                log.Verbose("Process executed in {proces_elapsed_time} ms", sw.ElapsedMilliseconds);
+            }
             return (s1, serr);
         }
     }

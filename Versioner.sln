@@ -5,6 +5,10 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Versioner", "Core\Versioner.csproj", "{6905885B-BE68-46B8-AFA6-707900B84EF1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{D2EA7652-8E99-43CC-8292-368B0D7F0BC6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Versioner.Tests", "Tests\Versioner.Tests.csproj", "{15E620A7-1070-46DB-9BE6-0A85948249DF}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{559989E8-815E-4D86-BE8E-802006CCD8BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Versioner.Cli", "Cli\Versioner.Cli.csproj", "{91AC3D2F-426C-4E8B-95AE-7BC762B5BA71}"
@@ -13,12 +17,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleConfigurationFiles",
 	ProjectSection(SolutionItems) = preProject
 		ExampleFiles\CustomProjectSettings.json = ExampleFiles\CustomProjectSettings.json
 		ExampleFiles\ProjectOverride.json = ExampleFiles\ProjectOverride.json
+		ExampleFiles\ProjectOverrideMajor.json = ExampleFiles\ProjectOverrideMajor.json
+		ExampleFiles\ProjectOverrideMajorMinor.json = ExampleFiles\ProjectOverrideMajorMinor.json
+		ExampleFiles\ProjectOverrideMajorMinorChange.json = ExampleFiles\ProjectOverrideMajorMinorChange.json
+		ExampleFiles\ProjectOverrideMajorMinorChangeFix.json = ExampleFiles\ProjectOverrideMajorMinorChangeFix.json
 		ExampleFiles\ProjectsGuid.json = ExampleFiles\ProjectsGuid.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ProjectFiles", "ProjectFiles", "{E6F8B91F-2182-4EE3-A5EC-24235A798A9A}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CsProjectFiles", "CsProjectFiles", "{CA351C35-9F5B-4038-8CF7-2A2AD0C1CACA}"
+	ProjectSection(SolutionItems) = preProject
+		ExampleFiles\CsProjectFiles\TestFile_Major_3.1.0.1.csproj = ExampleFiles\CsProjectFiles\TestFile_Major_3.1.0.1.csproj
 	EndProjectSection
 EndProject
 Global
@@ -31,6 +44,10 @@ Global
 		{6905885B-BE68-46B8-AFA6-707900B84EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6905885B-BE68-46B8-AFA6-707900B84EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6905885B-BE68-46B8-AFA6-707900B84EF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15E620A7-1070-46DB-9BE6-0A85948249DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15E620A7-1070-46DB-9BE6-0A85948249DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15E620A7-1070-46DB-9BE6-0A85948249DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15E620A7-1070-46DB-9BE6-0A85948249DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91AC3D2F-426C-4E8B-95AE-7BC762B5BA71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91AC3D2F-426C-4E8B-95AE-7BC762B5BA71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91AC3D2F-426C-4E8B-95AE-7BC762B5BA71}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,6 +58,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6905885B-BE68-46B8-AFA6-707900B84EF1} = {559989E8-815E-4D86-BE8E-802006CCD8BA}
+		{15E620A7-1070-46DB-9BE6-0A85948249DF} = {D2EA7652-8E99-43CC-8292-368B0D7F0BC6}
+		{CA351C35-9F5B-4038-8CF7-2A2AD0C1CACA} = {29A45B4E-5FC1-4AFC-99C6-ECE324EF780A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {26DEDC47-6C11-40DF-A720-479D50BBDD64}

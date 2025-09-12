@@ -10,6 +10,11 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
     {
         public VersioningBaseConfiguration GetProjectConfiguration(string relativePath)
         {
+            if (State.Config == null)
+            {
+                throw new InvalidOperationException("State.Config is null. Configuration not initialized.");
+            }
+            
             var config = State.Config.Items?.FirstOrDefault(f => f.ProjectFile?.AreEqual(relativePath) ?? false) ??
                          State.Config.Default;
             config.ProjectFile = relativePath;

@@ -34,6 +34,8 @@ namespace AnubisWorks.Tools.Versioner.Entity
             string assemblyVersion_ = null;
             string assemblyFileVersion_ = null;
             string description_ = null;
+            string versionPrefix_ = null;
+            string versionSuffix_ = null;
 
             csproj.Element("Project").XPathSelectElements("PropertyGroup").ToList().ForEach(xnPG =>
             {
@@ -43,12 +45,38 @@ namespace AnubisWorks.Tools.Versioner.Entity
                     xnPG.Element("FileVersion")?.Remove();
                     xnPG.Element("AssemblyVersion")?.Remove();
                     xnPG.Element("Description")?.Remove();
+                    xnPG.Element("VersionPrefix")?.Remove();
+                    xnPG.Element("VersionSuffix")?.Remove();
                 }
 
+                // Check for Version property first
                 if (xnPG.Element("Version") != null)
                 {
                     assemblyInformationalVersion_ = xnPG.Element("Version")?.Value ?? defaultVersion;
                     if (config.AssemblyInfoVersionSet) xnPG.Element("Version")?.Remove();
+                }
+                // If no Version, check for VersionPrefix + VersionSuffix combination
+                else
+                {
+                    if (xnPG.Element("VersionPrefix") != null)
+                    {
+                        versionPrefix_ = xnPG.Element("VersionPrefix")?.Value ?? defaultVersion;
+                        if (config.AssemblyVersionSet) xnPG.Element("VersionPrefix")?.Remove();
+                    }
+                    
+                    if (xnPG.Element("VersionSuffix") != null)
+                    {
+                        versionSuffix_ = xnPG.Element("VersionSuffix")?.Value ?? string.Empty;
+                        if (config.AssemblyVersionSet) xnPG.Element("VersionSuffix")?.Remove();
+                    }
+                    
+                    // Combine VersionPrefix + VersionSuffix if both exist
+                    if (!string.IsNullOrEmpty(versionPrefix_))
+                    {
+                        assemblyInformationalVersion_ = string.IsNullOrEmpty(versionSuffix_) 
+                            ? versionPrefix_ 
+                            : $"{versionPrefix_}-{versionSuffix_}";
+                    }
                 }
 
                 if (xnPG.Element("AssemblyVersion") != null)
@@ -89,6 +117,8 @@ namespace AnubisWorks.Tools.Versioner.Entity
             string assemblyVersion_ = null;
             string assemblyFileVersion_ = null;
             string description_ = null;
+            string versionPrefix_ = null;
+            string versionSuffix_ = null;
 
             csproj.Element("Project").XPathSelectElements("PropertyGroup").ToList().ForEach(xnPG =>
             {
@@ -98,12 +128,38 @@ namespace AnubisWorks.Tools.Versioner.Entity
                     xnPG.Element("FileVersion")?.Remove();
                     xnPG.Element("AssemblyVersion")?.Remove();
                     xnPG.Element("Description")?.Remove();
+                    xnPG.Element("VersionPrefix")?.Remove();
+                    xnPG.Element("VersionSuffix")?.Remove();
                 }
 
+                // Check for Version property first
                 if (xnPG.Element("Version") != null)
                 {
                     assemblyInformationalVersion_ = xnPG.Element("Version")?.Value ?? defaultVersion;
                     if (config.AssemblyInfoVersionSet) xnPG.Element("Version")?.Remove();
+                }
+                // If no Version, check for VersionPrefix + VersionSuffix combination
+                else
+                {
+                    if (xnPG.Element("VersionPrefix") != null)
+                    {
+                        versionPrefix_ = xnPG.Element("VersionPrefix")?.Value ?? defaultVersion;
+                        if (config.AssemblyVersionSet) xnPG.Element("VersionPrefix")?.Remove();
+                    }
+                    
+                    if (xnPG.Element("VersionSuffix") != null)
+                    {
+                        versionSuffix_ = xnPG.Element("VersionSuffix")?.Value ?? string.Empty;
+                        if (config.AssemblyVersionSet) xnPG.Element("VersionSuffix")?.Remove();
+                    }
+                    
+                    // Combine VersionPrefix + VersionSuffix if both exist
+                    if (!string.IsNullOrEmpty(versionPrefix_))
+                    {
+                        assemblyInformationalVersion_ = string.IsNullOrEmpty(versionSuffix_) 
+                            ? versionPrefix_ 
+                            : $"{versionPrefix_}-{versionSuffix_}";
+                    }
                 }
 
                 if (xnPG.Element("AssemblyVersion") != null)

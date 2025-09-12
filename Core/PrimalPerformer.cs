@@ -128,7 +128,9 @@ namespace AnubisWorks.Tools.Versioner
 
                 // Initialize configuration
                 VersionedSetModel versionedSetModel = new VersionedSetModel();
+                log.Information("Initializing configuration...");
                 _configurationService.InitializeConfiguration(Configuration, log);
+                log.Information("Configuration initialized. State.Config is null: {isNull}", State.Config == null);
 
                 // Calculate MonoRepo mode
                 if (!_config.IsMonoRepo && (_config.AllSlnLocations || !string.IsNullOrEmpty(_config.ExactProjectFile)))

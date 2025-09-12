@@ -29,6 +29,7 @@ namespace AnubisWorks.Tools.Versioner
 
         public static string RemoveQuotesFromString(this string path)
         {
+            if (path == null) return string.Empty;
             return path.Replace("\"", "").Replace("/\"", "").Replace("//","/").Replace("\"\"","\"");
         }
 

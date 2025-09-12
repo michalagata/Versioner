@@ -45,7 +45,20 @@ namespace AnubisWorks.Tools.Versioner.Entity
             string assemblyFileVersion, string assemblyVersion, string assemblyInformationalVersion, string PrereleaseSuffix = null)
         {
             List<XElement> vnodes = new List<XElement>();
-            if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Version", assemblyInformationalVersion));
+            
+            // Use either Version OR VersionPrefix+VersionSuffix, not both
+            if (string.IsNullOrEmpty(PrereleaseSuffix))
+            {
+                // No suffix - use Version property
+                if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Version", assemblyInformationalVersion));
+            }
+            else
+            {
+                // Has suffix - use VersionPrefix + VersionSuffix instead of Version
+                if (config.AssemblyVersionSet) vnodes.Add(new XElement("VersionPrefix", assemblyVersion));
+                if (config.AssemblyVersionSet) vnodes.Add(new XElement("VersionSuffix", SanitizeVersionSuffix(PrereleaseSuffix)));
+            }
+            
             if (config.AssemblyVersionSet) vnodes.Add(new XElement("AssemblyVersion", assemblyVersion));
             if (config.AssemblyFileVersionSet) vnodes.Add(new XElement("FileVersion", assemblyFileVersion));
             if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Description", description));
@@ -53,17 +66,6 @@ namespace AnubisWorks.Tools.Versioner.Entity
             project
                 .Element("Project")
                 .Add(new XElement("PropertyGroup", vnodes));
-
-            if (!string.IsNullOrEmpty(PrereleaseSuffix))
-            {
-                List<XElement> extranodes = new List<XElement>();
-                if (config.AssemblyVersionSet) extranodes.Add(new XElement("VersionPrefix", assemblyVersion));
-                if (config.AssemblyVersionSet) extranodes.Add(new XElement("VersionSuffix", PrereleaseSuffix));
-
-                project
-                    .Element("Project")
-                    .Add(new XElement("PropertyGroup", extranodes));
-            }
         }
 
         public void SetNewVersionsToProps(XDocument project, VersioningBaseConfiguration config,
@@ -71,7 +73,20 @@ namespace AnubisWorks.Tools.Versioner.Entity
             string assemblyFileVersion, string assemblyVersion, string assemblyInformationalVersion, string PrereleaseSuffix = null)
         {
             List<XElement> vnodes = new List<XElement>();
-            if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Version", assemblyInformationalVersion));
+            
+            // Use either Version OR VersionPrefix+VersionSuffix, not both
+            if (string.IsNullOrEmpty(PrereleaseSuffix))
+            {
+                // No suffix - use Version property
+                if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Version", assemblyInformationalVersion));
+            }
+            else
+            {
+                // Has suffix - use VersionPrefix + VersionSuffix instead of Version
+                if (config.AssemblyVersionSet) vnodes.Add(new XElement("VersionPrefix", assemblyVersion));
+                if (config.AssemblyVersionSet) vnodes.Add(new XElement("VersionSuffix", SanitizeVersionSuffix(PrereleaseSuffix)));
+            }
+            
             if (config.AssemblyVersionSet) vnodes.Add(new XElement("AssemblyVersion", assemblyVersion));
             if (config.AssemblyFileVersionSet) vnodes.Add(new XElement("FileVersion", assemblyFileVersion));
             if (config.AssemblyInfoVersionSet) vnodes.Add(new XElement("Description", description));
@@ -79,17 +94,6 @@ namespace AnubisWorks.Tools.Versioner.Entity
             project
                 .Element("Project")
                 .Add(new XElement("PropertyGroup", vnodes));
-
-            if (!string.IsNullOrEmpty(PrereleaseSuffix))
-            {
-                List<XElement> extranodes = new List<XElement>();
-                if (config.AssemblyVersionSet) extranodes.Add(new XElement("VersionPrefix", assemblyVersion));
-                if (config.AssemblyVersionSet) extranodes.Add(new XElement("VersionSuffix", PrereleaseSuffix));
-
-                project
-                    .Element("Project")
-                    .Add(new XElement("PropertyGroup", extranodes));
-            }
         }
 
         public void SetNewVersionsToAssemblyInfoFile(string assemblyInfoFilePath, string assemblyVersion,
@@ -128,6 +132,33 @@ namespace AnubisWorks.Tools.Versioner.Entity
             }
 
             return jObject;
+        }
+
+        /// <summary>
+        /// Sanitizes version suffix by removing invalid characters for NuGet versioning.
+        /// Replaces forward slashes with hyphens and removes other invalid characters.
+        /// </summary>
+        /// <param name="suffix">The version suffix to sanitize</param>
+        /// <returns>Sanitized version suffix</returns>
+        private static string SanitizeVersionSuffix(string suffix)
+        {
+            if (string.IsNullOrEmpty(suffix))
+                return string.Empty;
+
+            // Replace forward slashes with hyphens (common in branch names)
+            // Remove other invalid characters for NuGet versioning
+            return suffix
+                .Replace("/", "-")
+                .Replace("\\", "-")
+                .Replace(" ", "-")
+                .Replace(":", "-")
+                .Replace("*", "-")
+                .Replace("?", "-")
+                .Replace("\"", "-")
+                .Replace("<", "-")
+                .Replace(">", "-")
+                .Replace("|", "-")
+                .Trim('-'); // Remove leading/trailing hyphens
         }
     }
 } 

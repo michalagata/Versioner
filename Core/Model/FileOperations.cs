@@ -20,7 +20,13 @@ namespace AnubisWorks.Tools.Versioner.Model
         {
             try
             {
-                return Directory.GetFiles(workingDirectory, pattern, SearchOption.AllDirectories).ToList();
+                var allFiles = Directory.GetFiles(workingDirectory, pattern, SearchOption.AllDirectories);
+                
+                // Filter out files from obj/ and bin/ directories
+                return allFiles
+                    .Where(file => !file.Contains("/obj/") && !file.Contains("\\obj\\") && 
+                                   !file.Contains("/bin/") && !file.Contains("\\bin\\"))
+                    .ToList();
             }
             catch (Exception ex)
             {
@@ -79,7 +85,8 @@ namespace AnubisWorks.Tools.Versioner.Model
             catch (Exception ex)
             {
                 _logger.Error(ex, "Error setting current directory to {path}", path);
-                throw;
+                // Don't throw - continue with full paths instead
+                _logger.Warning("Continuing with full paths instead of changing working directory");
             }
         }
     }
