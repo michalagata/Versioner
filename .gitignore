@@ -23,6 +23,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 .cursor/
+scripts/
+.scripts/
+
 
 # Visual Studio 2015 cache/options directory
 .vs/
