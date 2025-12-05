@@ -93,7 +93,7 @@ namespace AnubisWorks.Tools.Versioner
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(_config.logLevel,
-                    "{Timestamp:HH:mm:ss.fff} [{Level:u1}] [{Context:u25}] {Message}{NewLine}")
+                    "{Timestamp:HH:mm:ss.fff} [{Level:u1}] [{Context:u25}] {Message}{NewLine}{Exception}")
                 .CreateLogger()
                 .ForContext("Context", nameof(PrimalPerformer), true);
             CommitInfoTypeExtensions.CommitInformation commitInformation = typeof(PrimalPerformer).GetCommitInformation();
