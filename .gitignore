@@ -24,7 +24,7 @@ bld/
 [Ll]og/
 .cursor/
 scripts/
-.scripts/
+DEPLOYMENT/
 
 
 # Visual Studio 2015 cache/options directory

@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningsAsErrors />
     <WarningsNotAsErrors>NU1701;NU1507;NU1603</WarningsNotAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -21,15 +20,11 @@
     <PublishReadyToRun Condition="'$(Configuration)' == 'Release'">true</PublishReadyToRun>
     <PublishSingleFile Condition="'$(Configuration)' == 'Release'">false</PublishSingleFile>
     <SelfContained Condition="'$(Configuration)' == 'Release'">false</SelfContained>
-    <AssemblyOriginatorKeyFile />
     <SignAssembly>false</SignAssembly>
     <DelaySign>false</DelaySign>
     <PublicSign>false</PublicSign>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <AssemblyVersion>8.1.0.0</AssemblyVersion>
-    <FileVersion>8.1.0.0</FileVersion>
     <InformationalVersion>8.1.0.0</InformationalVersion>
-    <PackageVersion>8.1.0.0</PackageVersion>
     <Copyright>Copyright (c) 2016-$([System.DateTime]::Now.Year) Michael Agata, AnubisWorks</Copyright>
     <Company>AnubisWorks</Company>
     <Authors>Michael Agata</Authors>
@@ -42,24 +37,26 @@
     <PackageTags>versioning;semver;git;dotnet;cli</PackageTags>
     <PackageDescription>Advanced versioning tool for .NET projects with Git integration and semantic versioning support</PackageDescription>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
   </ItemGroup>
-
+  <PropertyGroup>
+    <Version>9.1.340.28+d5a37c5</Version>
+    <AssemblyVersion>9.1.340.28</AssemblyVersion>
+    <FileVersion>9.1.340.28</FileVersion>
+    <Description>ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5|ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5</Description>
+  </PropertyGroup>
 </Project>

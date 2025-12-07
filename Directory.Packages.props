@@ -3,7 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
-
   <ItemGroup Label="Package Versions">
     <!-- Core .NET packages -->
     <PackageVersion Include="Microsoft.NETCore.App" Version="8.0.0" />
@@ -15,11 +14,9 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-
     <!-- JSON handling -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="System.Text.Json" Version="8.0.0" />
-
     <!-- Logging -->
     <PackageVersion Include="Serilog" Version="4.2.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
@@ -27,7 +24,6 @@
     <PackageVersion Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.0" />
-
     <!-- Testing -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="xunit" Version="2.9.2" />
@@ -40,22 +36,24 @@
     <PackageVersion Include="FluentAssertions" Version="6.12.2" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="AutoFixture" Version="4.18.1" />
-
     <!-- Git operations -->
     <PackageVersion Include="LibGit2Sharp" Version="0.29.0" />
     <PackageVersion Include="Microsoft.Alm.Authentication" Version="4.3.0" />
-
     <!-- CLI -->
     <PackageVersion Include="ArgsInterceptor" Version="7.8.128.16" />
-
     <!-- Code analysis -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
     <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.58.0.78984" />
-
     <!-- Security -->
     <PackageVersion Include="Microsoft.AspNetCore.DataProtection" Version="8.0.0" />
     <PackageVersion Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
+  <PropertyGroup>
+    <Version>9.1.340.28+d5a37c5</Version>
+    <AssemblyVersion>9.1.340.28</AssemblyVersion>
+    <FileVersion>9.1.340.28</FileVersion>
+    <Description>ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5|ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5</Description>
+  </PropertyGroup>
 </Project>
