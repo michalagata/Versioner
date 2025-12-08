@@ -54,9 +54,9 @@
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>9.1.340.28+d5a37c5</Version>
-    <AssemblyVersion>9.1.340.28</AssemblyVersion>
-    <FileVersion>9.1.340.28</FileVersion>
-    <Description>ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5|ChangeHash:d5a37c5,BuildLabel:REV_20251206_1044_d5a37c5</Description>
+    <Version>9.1.341.29+f993cc8</Version>
+    <AssemblyVersion>9.1.341.29</AssemblyVersion>
+    <FileVersion>9.1.341.29</FileVersion>
+    <Description>ChangeHash:f993cc8,BuildLabel:REV_20251207_1913_f993cc8|ChangeHash:f993cc8,BuildLabel:REV_20251207_1913_f993cc8</Description>
   </PropertyGroup>
 </Project>
