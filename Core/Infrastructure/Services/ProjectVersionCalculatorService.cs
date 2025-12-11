@@ -200,12 +200,13 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
             }
 
             // Obsługa GUID projektów
-            if (State.MaintainProjectGuids && projectType != ProjectType.PackageJson)
+            // ProjectGuid dotyczy wyłącznie plików CSPROJ (Sdk/AssemblyInfo). Props pomijamy.
+            if (State.MaintainProjectGuids &&
+                (projectType == ProjectType.Sdk || projectType == ProjectType.AssemblyInfo))
             {
                 if (ProjectEntityStatic.SetProjectGuid(project, relative))
                 {
                     savecsproj = true;
-                    saveprops = true;
                 }
             }
 
@@ -287,7 +288,9 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
                 projectType, description, assemblyFileVersion, assemblyVersion, assemblyInformationalVersion, 
                 filePath, "");
 
-            if (State.MaintainProjectGuids && projectType != ProjectType.PackageJson)
+            // ProjectGuid dotyczy wyłącznie plików CSPROJ (Sdk/AssemblyInfo). Props pomijamy.
+            if (State.MaintainProjectGuids &&
+                (projectType == ProjectType.Sdk || projectType == ProjectType.AssemblyInfo))
             {
                 if (ProjectEntityStatic.SetProjectGuid(project, relative)) savecsproj = true;
             }
