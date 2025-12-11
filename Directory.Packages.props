@@ -51,9 +51,9 @@
     <PackageVersion Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>9.1.342.30+a98aca1</Version>
-    <AssemblyVersion>9.1.342.30</AssemblyVersion>
-    <FileVersion>9.1.342.30</FileVersion>
-    <Description>ChangeHash:a98aca1,BuildLabel:REV_20251208_1314_a98aca1|ChangeHash:a98aca1,BuildLabel:REV_20251208_1314_a98aca1</Description>
+    <Version>9.1.345.32+d438748</Version>
+    <AssemblyVersion>9.1.345.32</AssemblyVersion>
+    <FileVersion>9.1.345.32</FileVersion>
+    <Description>ChangeHash:d438748,BuildLabel:REV_20251211_1215_d438748</Description>
   </PropertyGroup>
 </Project>
