@@ -19,7 +19,7 @@ namespace AnubisWorks.Tools.Versioner.Model
         public bool StoreVersionFile { get; set; }
         public string WorkingFolder { get; set; }
         public bool UseDefaults { get; set; }
-        public string ConfigurationFile { get; set; }
+        // ConfigurationFile parameter removed - all configuration is now done via command line parameters and defaults
         public string CustomConfigurationFile { get; set; }
 
         public string LogLevel
@@ -72,10 +72,18 @@ namespace AnubisWorks.Tools.Versioner.Model
         public string ExactProjectFile { get; set; }
         public bool IsMonoRepo { get; set; } = false;
         public bool DebugMode { get; set; } = false;
-        public bool VersionNuspecsEvenIfOtherFilesExist { get; set; } = false;
-        public int SemVersion { get; set; } = 1;
+        // VersionNuspecsEvenIfOtherFilesExist removed - use VersionItems="nuget" instead
         public string PreReleaseSuffix { get; set; } = string.Empty;
         public string DefinedPatch { get; set; } = string.Empty;
         public bool VersionOnlyProps { get; set; } = true;
+        // EnforceGlobalVersioning is now always enabled by default (removed CLI parameter)
+        // NpmOnly and NpmExclude removed - replaced by automatic artifact detection
+        
+        // Webhook support (Phase 3)
+        public string WebhookUrl { get; set; } = string.Empty;
+        public string WebhookToken { get; set; } = string.Empty;
+        
+        // Selective versioning (Phase 5)
+        public string VersionItems { get; set; } = string.Empty;
     }
 }

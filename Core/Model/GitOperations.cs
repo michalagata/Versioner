@@ -94,5 +94,82 @@ namespace AnubisWorks.Tools.Versioner.Model
             var table = output.Split(",", StringSplitOptions.None);
             return table[8];
         }
+
+        public string GetGitRepositoryRoot(string workingDirectory)
+        {
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = _gitExecutable,
+                    Arguments = "rev-parse --show-toplevel",
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            try
+            {
+                process.Start();
+                var output = process.StandardOutput.ReadToEnd();
+                var error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0 || !string.IsNullOrEmpty(error))
+                {
+                    _logger.Error("Error getting git repository root: {error}", error);
+                    throw new Exception($"Failed to get git repository root: {error}");
+                }
+
+                var rootPath = output.Trim().Replace("\n", "").Replace("\r", "");
+                if (string.IsNullOrWhiteSpace(rootPath))
+                {
+                    throw new Exception("Git repository root path is empty");
+                }
+
+                return rootPath;
+            }
+            finally
+            {
+                process?.Dispose();
+            }
+        }
+
+        public bool IsGitRepository(string directory)
+        {
+            var process = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = _gitExecutable,
+                    Arguments = "rev-parse --git-dir",
+                    WorkingDirectory = directory,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            try
+            {
+                process.Start();
+                var error = process.StandardError.ReadToEnd();
+                process.WaitForExit();
+
+                return process.ExitCode == 0 && string.IsNullOrEmpty(error);
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                process?.Dispose();
+            }
+        }
     }
 } 

@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Product>Versioner.Tests</Product>
+    <PackageId>Versioner.Tests</PackageId>
+    <AssemblyName>Versioner.Tests</AssemblyName>
+    <RootNamespace>AnubisWorks.Versioner.Tests</RootNamespace>
+    <Authors>Michael Agata</Authors>
+    <Copyright>(c) 2020 Michael Agata, AnubisWorks</Copyright>
+    <Company>AnubisWorks</Company>
+    <OutputPath>..\DEPLOYMENT\</OutputPath>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Configurations>Debug;Release</Configurations>
+    <Optimize Condition="'$(Configuration)'=='Release'">true</Optimize>
+    <SignAssembly>false</SignAssembly>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <AssemblyInformationalVersion>1.0.0.0</AssemblyInformationalVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" />
+    <PackageReference Include="Microsoft.Alm.Authentication" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.assert" />
+    <PackageReference Include="xunit.runner.console">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Versioner.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <Version>10.2.7.8+74d9cb0</Version>
+    <AssemblyVersion>10.2.7.8</AssemblyVersion>
+    <FileVersion>10.2.7.8</FileVersion>
+    <Description>ChangeHash:74d9cb0,BuildLabel:REV_20260107_1153_74d9cb0|ChangeHash:e4ec123,BuildLabel:REV_20260107_1128_e4ec123</Description>
+  </PropertyGroup>
+</Project>

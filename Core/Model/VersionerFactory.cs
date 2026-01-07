@@ -73,6 +73,21 @@ namespace AnubisWorks.Tools.Versioner.Model
             return new OverrideVersioningService(logger, fileOperations);
         }
 
+        public static IGlobalRepoVersioningService CreateGlobalRepoVersioningService(ILogger logger, IFileOperations fileOperations, IArtifactDiscoveryService? artifactDiscoveryService = null)
+        {
+            return new GlobalRepoVersioningService(logger, fileOperations, artifactDiscoveryService);
+        }
+
+        public static IArtifactDiscoveryService CreateArtifactDiscoveryService(ILogger logger, IFileOperations fileOperations)
+        {
+            return new ArtifactDiscoveryService(fileOperations, logger);
+        }
+
+        public static IWebhookService CreateWebhookService(ILogger logger)
+        {
+            return new WebhookService(logger);
+        }
+
         public static PrimalPerformer CreatePrimalPerformer(ConfigurationsArgs config, ILogger logger)
         {
             var gitOperations = CreateGitOperations(logger);

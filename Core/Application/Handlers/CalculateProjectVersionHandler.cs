@@ -28,7 +28,6 @@ namespace AnubisWorks.Tools.Versioner.Application.Handlers
                 request.StoreVersionFile,
                 request.PatchHotfixModel,
                 request.CustomProjectSettings,
-                request.SemVersion,
                 request.PrereleaseSuffix,
                 request.DefinedPatch,
                 request.CalculateMonoMode);

@@ -145,10 +145,12 @@ namespace AnubisWorks.Tools.Versioner.Entity
                 try
                 {
                     string vertxtpath = Path.Combine(projDir, "version.txt");
+                    string versionContent = assemblyVersion;
                     if (!string.IsNullOrEmpty(PrereleaseSuffix))
                     {
-                        File.WriteAllText(vertxtpath, assemblyVersion + "-" + PrereleaseSuffix);
+                        versionContent = assemblyVersion + "-" + PrereleaseSuffix;
                     }
+                    File.WriteAllText(vertxtpath, versionContent);
                 }
                 catch (Exception e)
                 {
@@ -161,7 +163,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             ProjectType projectType, string assemblyVersion, string assemblyInformationalVersion,
             string assemblyFileVersion)
         {
-            var relativeDir = Path.GetRelativePath(workingFolder, Path.GetDirectoryName(filePath)).ToLinuxPath();
+            var relativeDir = Path.GetRelativePath(workingFolder, Path.GetDirectoryName(filePath)).NormalizePath();
 
             string verEnvname = relativeDir.Replace("/", "_");
             consoleOutputs.Add($"##teamcity[setParameter name='Version.{verEnvname}' value='{assemblyVersion}']");

@@ -2,28 +2,29 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <AssemblyInformationalVersion>1.0.0.0</AssemblyInformationalVersion>
   </PropertyGroup>
   <ItemGroup Label="Package Versions">
     <!-- Core .NET packages -->
-    <PackageVersion Include="Microsoft.NETCore.App" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.NETCore.App" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
     <!-- JSON handling -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="10.0.0" />
     <!-- Logging -->
     <PackageVersion Include="Serilog" Version="4.2.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
     <!-- Testing -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="xunit" Version="2.9.2" />
@@ -43,17 +44,17 @@
     <PackageVersion Include="ArgsInterceptor" Version="7.8.128.16" />
     <!-- Code analysis -->
     <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.58.0.78984" />
     <!-- Security -->
-    <PackageVersion Include="Microsoft.AspNetCore.DataProtection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.DataProtection" Version="10.0.0" />
     <PackageVersion Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>9.1.345.32+d438748</Version>
-    <AssemblyVersion>9.1.345.32</AssemblyVersion>
-    <FileVersion>9.1.345.32</FileVersion>
-    <Description>ChangeHash:d438748,BuildLabel:REV_20251211_1215_d438748</Description>
+    <Version>10.2.6.44+92febe4</Version>
+    <AssemblyVersion>10.2.6.44</AssemblyVersion>
+    <FileVersion>10.2.6.44</FileVersion>
+    <Description>ChangeHash:92febe4,BuildLabel:REV_20260106_1757_92febe4</Description>
   </PropertyGroup>
 </Project>

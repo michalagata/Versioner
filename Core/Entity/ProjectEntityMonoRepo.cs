@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using AnubisWorks.Tools.Versioner.Domain.Interfaces;
 using AnubisWorks.Tools.Versioner.Entity;
 using AnubisWorks.Tools.Versioner.Helper;
 using AnubisWorks.Tools.Versioner.Model;
@@ -40,13 +41,15 @@ namespace AnubisWorks.Tools.Versioner
             var versionPatternService = new VersionPatternService();
             var projectConfigurationService = new ProjectConfigurationService();
             var projectFileService = new ProjectFileService();
+            var versionPropertyInjector = new VersionPropertyInjector(log);
             
             _projectVersionCalculator = new ProjectVersionCalculatorService(
                 log,
                 gitLogService,
                 versionPatternService,
                 projectConfigurationService,
-                projectFileService);
+                projectFileService,
+                versionPropertyInjector);
 
             // Użycie nowego serwisu do przetwarzania MonoRepo
             _projectVersionCalculator.ProcessMonoRepoProject(

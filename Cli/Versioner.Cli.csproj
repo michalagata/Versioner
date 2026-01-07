@@ -12,6 +12,14 @@
     <Configurations>Debug;Release</Configurations>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <!-- Dotnet Tool Configuration -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>versioner</ToolCommandName>
+    <!-- Disable trimming for dotnet tool packaging -->
+    <PublishTrimmed Condition="'$(Configuration)' == 'Release'">false</PublishTrimmed>
+    <!-- Remove PackageReadmeFile requirement - README.md is in repo root, not in CLI directory -->
+    <PackageReadmeFile Condition="'$(PackageReadmeFile)' != ''"></PackageReadmeFile>
+    <AssemblyInformationalVersion>1.0.0.0</AssemblyInformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\versioner.ico" />
@@ -29,9 +37,9 @@
     <Folder Include="Helper\" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>8.1.0.0+2c61d8b</Version>
-    <AssemblyVersion>8.1.0.0</AssemblyVersion>
-    <FileVersion>8.1.0.0</FileVersion>
-    <Description>ChangeHash:2c61d8b,BuildLabel:REV_20250601_1515_7052e7d</Description>
+    <Version>10.2.7.21+74d9cb0</Version>
+    <AssemblyVersion>10.2.7.21</AssemblyVersion>
+    <FileVersion>10.2.7.21</FileVersion>
+    <Description>ChangeHash:74d9cb0,BuildLabel:REV_20260107_1153_74d9cb0|ChangeHash:e4ec123,BuildLabel:REV_20260107_1128_e4ec123</Description>
   </PropertyGroup>
 </Project>

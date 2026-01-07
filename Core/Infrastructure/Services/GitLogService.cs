@@ -34,12 +34,7 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
                 
                 config.Directories.ForEach(subDir =>
                 {
-                    string sdir = string.Empty;
-                    if (PlatformDetector.GetOperatingSystem() == OSPlatform.Windows)
-                        sdir = Path.Combine(workingFolder, subDir.ToWindowsPath());
-                    if (PlatformDetector.GetOperatingSystem() == OSPlatform.Linux ||
-                        PlatformDetector.GetOperatingSystem() == OSPlatform.OSX)
-                        sdir = Path.Combine(workingFolder, subDir.ToLinuxPath());
+                    string sdir = Path.Combine(workingFolder, subDir.NormalizePath());
                     
                     if (!Directory.Exists(sdir))
                         _log.Error("Directory {subDir} does not exists", subDir);

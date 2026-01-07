@@ -30,7 +30,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
         public void VersionTsFile(string filePath, string buildLabel, string shortHash,
             string assemblyVersion, string assemblyFileVersion, string assemblyInformationalVersion)
         {
-            string tsVersionFile = Path.Combine(Path.GetDirectoryName(filePath), "ClientApp\\src\\assemblyinfo.ts");
+            string tsVersionFile = Path.Combine(Path.GetDirectoryName(filePath), "ClientApp", "src", "assemblyinfo.ts");
             if (File.Exists(tsVersionFile))
             {
                 _logger.Information("Generating TypeScript assemblyinfo.ts");
@@ -52,10 +52,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             ref string assemblyVersion)
         {
             string aifile = string.Empty;
-            if(PlatformDetector.GetOperatingSystem() == OSPlatform.Windows) aifile = assemblyInfoFilePath =
-                Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.ToWindowsPath());
-            if(PlatformDetector.GetOperatingSystem() == OSPlatform.Linux || PlatformDetector.GetOperatingSystem() == OSPlatform.OSX) aifile = assemblyInfoFilePath =
-                Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.ToLinuxPath());
+            aifile = assemblyInfoFilePath = Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.NormalizePath());
             if (File.Exists(aifile))
             {
                 string content = File.ReadAllText(aifile);
@@ -85,7 +82,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             }
             else
             {
-                return string.Format("AssemblyInfo File not found. {file}", aifile);
+                return $"AssemblyInfo File not found. {aifile}";
             }
 
             return string.Empty;

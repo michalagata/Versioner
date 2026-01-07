@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using AnubisWorks.Tools.Versioner.Domain.Interfaces;
 using AnubisWorks.Tools.Versioner.Entity;
 using AnubisWorks.Tools.Versioner.Helper;
 using AnubisWorks.Tools.Versioner.Model;
@@ -35,7 +36,6 @@ namespace AnubisWorks.Tools.Versioner
         public ProjectEntity(string gitPath, string filePath, string workingFolder, ref List<string> consoleOutputs, string buildLabel,
             bool storeVersionFile, MajorMinorPatchHotfixModel patchHotfixModel,
             CustomProjectSettings customProjectSettings,
-            int semVersion,
             string PrereleaseSuffix,
             string DefinedPatch,
             bool calculateMonoMode = false)
@@ -48,15 +48,17 @@ namespace AnubisWorks.Tools.Versioner
             var versionPatternService = new VersionPatternService();
             var projectConfigurationService = new ProjectConfigurationService();
             var projectFileService = new ProjectFileService();
+            var versionPropertyInjector = new VersionPropertyInjector(log);
             
             _projectVersionCalculator = new ProjectVersionCalculatorService(
                 log,
                 gitLogService,
                 versionPatternService,
                 projectConfigurationService,
-                projectFileService);
+                projectFileService,
+                versionPropertyInjector);
 
-            // Użycie nowego serwisu do kalkulacji wersji
+            // Użycie nowego serwisu do kalkulacji wersji (zawsze SemVer V1)
             VersionedSetReturner = _projectVersionCalculator.CalculateVersion(
                 gitPath,
                 filePath,
@@ -66,7 +68,6 @@ namespace AnubisWorks.Tools.Versioner
                 storeVersionFile,
                 patchHotfixModel,
                 customProjectSettings,
-                semVersion,
                 PrereleaseSuffix,
                 DefinedPatch,
                 calculateMonoMode);

@@ -14,7 +14,6 @@ namespace AnubisWorks.Tools.Versioner.Interfaces
             bool storeVersionFile,
             MajorMinorPatchHotfixModel patchHotfixModel,
             CustomProjectSettings customProjectSettings,
-            int semVersion,
             string prereleaseSuffix,
             string definedPatch,
             bool calculateMonoMode = false);

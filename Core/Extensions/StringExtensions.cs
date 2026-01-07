@@ -3,44 +3,74 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using AnubisWorks.Tools.Versioner.Helper;
 
 namespace AnubisWorks.Tools.Versioner
 {
+    /// <summary>
+    /// Provides cross-platform string extension methods for path handling and string manipulation.
+    /// </summary>
     public static class StringExtensions
     {
-        public static string RemoveIllegalCharactersWindowsPath(this string path)
+        /// <summary>
+        /// Removes illegal characters from a path and normalizes it for the current platform.
+        /// </summary>
+        /// <param name="path">The path to clean.</param>
+        /// <returns>A cleaned path normalized for the current platform.</returns>
+        public static string RemoveIllegalCharactersPath(this string path)
         {
-            return path.RemoveQuotesFromString().RemoveIllegalPathCharacters().ToWindowsPath();
+            return path.RemoveQuotesFromString().RemoveIllegalPathCharacters().NormalizePath();
         }
 
-        public static string RemoveIllegalCharactersLinuxPath(this string path)
-        {
-            return path.RemoveQuotesFromString().RemoveIllegalPathCharacters().ToLinuxPath();
-        }
-
+        /// <summary>
+        /// Removes illegal path characters from a string.
+        /// </summary>
+        /// <param name="path">The path to clean.</param>
+        /// <returns>A string with illegal path characters removed.</returns>
         public static string RemoveIllegalPathCharacters(this string path)
         {
+            if (string.IsNullOrEmpty(path)) return string.Empty;
+            
             string regex = $"[{Regex.Escape(new string(Path.GetInvalidPathChars()))}]";
             Regex removeInvalidChars = new Regex(regex, RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
             return removeInvalidChars.Replace(path, "");
-
         }
 
+        /// <summary>
+        /// Removes quotes and normalizes path separators in a string.
+        /// </summary>
+        /// <param name="path">The path to clean.</param>
+        /// <returns>A cleaned path string.</returns>
         public static string RemoveQuotesFromString(this string path)
         {
             if (path == null) return string.Empty;
-            return path.Replace("\"", "").Replace("/\"", "").Replace("//","/").Replace("\"\"","\"");
+            return path.Replace("\"", "").Replace("/\"", "").Replace("//", "/").Replace("\"\"", "\"");
         }
 
-        public static string ToLinuxPath(this string path)
+        /// <summary>
+        /// Normalizes a path to use the appropriate path separator for the current platform.
+        /// </summary>
+        /// <param name="path">The path to normalize.</param>
+        /// <returns>A normalized path string.</returns>
+        public static string NormalizePath(this string path)
+        {
+            if (string.IsNullOrEmpty(path)) return path;
+            
+            char separator = PlatformDetector.GetPathSeparator();
+            char oppositeSeparator = separator == '/' ? '\\' : '/';
+            
+            return path.Replace(oppositeSeparator, separator);
+        }
+
+        /// <summary>
+        /// Converts a path to use forward slashes (Unix-style).
+        /// </summary>
+        /// <param name="path">The path to convert.</param>
+        /// <returns>A path with forward slashes.</returns>
+        public static string ToUnixPath(this string path)
         {
             return path?.Replace("\\", "/");
-        }
-
-        public static string ToWindowsPath(this string path)
-        {
-            return path?.Replace("/", "\\");
         }
 
         public static bool AreEqual(this string str1, string str2)

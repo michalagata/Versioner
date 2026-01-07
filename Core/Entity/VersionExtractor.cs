@@ -221,10 +221,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             ref string assemblyVersion)
         {
             string aifile = string.Empty;
-            if(PlatformDetector.GetOperatingSystem() == OSPlatform.Windows) aifile = assemblyInfoFilePath =
-                Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.ToWindowsPath());
-            if(PlatformDetector.GetOperatingSystem() == OSPlatform.Linux || PlatformDetector.GetOperatingSystem() == OSPlatform.OSX) aifile = assemblyInfoFilePath =
-                Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.ToLinuxPath());
+            aifile = assemblyInfoFilePath = Path.Combine(Path.GetDirectoryName(filePath), cfgEntryAssemblyInfoFile.NormalizePath());
             if (File.Exists(aifile))
             {
                 string content = File.ReadAllText(aifile);
@@ -254,7 +251,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             }
             else
             {
-                return string.Format("AssemblyInfo File not found. {file}", aifile);
+                return $"AssemblyInfo File not found. {aifile}";
             }
 
             return string.Empty;

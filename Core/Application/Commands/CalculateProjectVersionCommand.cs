@@ -14,7 +14,6 @@ namespace AnubisWorks.Tools.Versioner.Application.Commands
         public bool StoreVersionFile { get; set; }
         public MajorMinorPatchHotfixModel PatchHotfixModel { get; set; }
         public CustomProjectSettings CustomProjectSettings { get; set; }
-        public int SemVersion { get; set; }
         public string PrereleaseSuffix { get; set; }
         public string DefinedPatch { get; set; }
         public bool CalculateMonoMode { get; set; }
@@ -28,7 +27,6 @@ namespace AnubisWorks.Tools.Versioner.Application.Commands
             bool storeVersionFile,
             MajorMinorPatchHotfixModel patchHotfixModel,
             CustomProjectSettings customProjectSettings,
-            int semVersion,
             string prereleaseSuffix,
             string definedPatch,
             bool calculateMonoMode = false)
@@ -41,7 +39,6 @@ namespace AnubisWorks.Tools.Versioner.Application.Commands
             StoreVersionFile = storeVersionFile;
             PatchHotfixModel = patchHotfixModel;
             CustomProjectSettings = customProjectSettings;
-            SemVersion = semVersion;
             PrereleaseSuffix = prereleaseSuffix;
             DefinedPatch = definedPatch;
             CalculateMonoMode = calculateMonoMode;

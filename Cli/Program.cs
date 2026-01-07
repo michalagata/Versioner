@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net;
+using System.IO;
 using AnubisWorks.Lib.ArgsInterceptor;
 using AnubisWorks.Tools.Versioner.Cli.Helper;
 using AnubisWorks.Tools.Versioner.Model;
+using AnubisWorks.Tools.Versioner.Helper;
 
 namespace AnubisWorks.Tools.Versioner.Cli
 {
@@ -23,10 +25,6 @@ namespace AnubisWorks.Tools.Versioner.Cli
                 .As('w', "workingfolder")
                 .Required()
                 .WithDescription("Full path to working folder");
-
-            p.Setup(arg => arg.ConfigurationFile)
-                .As('c', "configurationfile")
-                .WithDescription("Set full path to configuration file");
 
             p.Setup(arg => arg.StoreVersionFile)
                 .As('s', "storeversionfile")
@@ -63,26 +61,16 @@ namespace AnubisWorks.Tools.Versioner.Cli
             //ExactProjectFile
             p.Setup(arg => arg.ProjectsGuidConfiguration)
                 .As('f', "projectsguidconfig")
-                .SetDefault("C:\\projectguids.json")
+                .SetDefault(AnubisWorks.Tools.Versioner.Helper.PathValidator.GetPlatformDefaultPath("projectguids.json"))
                 .WithDescription("Projects Guid Configuration location. Required for parameter g (setprojectguid)");
 
             //CustomConfigurationFile
             p.Setup(arg => arg.CustomConfigurationFile)
                 .As('u', "customprojectconfig")
-                .SetDefault("C:\\customprojectconfig.json")
+                .SetDefault(AnubisWorks.Tools.Versioner.Helper.PathValidator.GetPlatformDefaultPath("customprojectconfig.json"))
                 .WithDescription("Custom Projects Settings Configuration location");
 
-            //SetProjectGuid
-            p.Setup(arg => arg.VersionNuspecsEvenIfOtherFilesExist)
-                .As('e', "enforcenuspecversioningwithotherfiles")
-                .SetDefault(false)
-                .WithDescription("Should be NuSPEC files be versioned if other identified files for versioning exist?");
-
-            //SemVersion
-            p.Setup(arg => arg.SemVersion)
-                .As('v', "semversion")
-                .SetDefault(1)
-                .WithDescription("Semantic Versioning Format Version (1/2)");
+            // VersionNuspecsEvenIfOtherFilesExist parameter removed - use --versionItems="nuget" instead
 
             //PreReleaseSuffix
             p.Setup(arg => arg.PreReleaseSuffix)
@@ -100,9 +88,95 @@ namespace AnubisWorks.Tools.Versioner.Cli
             p.Setup(arg => arg.VersionOnlyProps)
                 .As('n', "versiononlyprops")
                 .SetDefault(true)
-                .WithDescription("Should only .props file be identified for versioning if exists? Setting to false shall trat props along with project files.");
+                .WithDescription("Should only .props file be identified for versioning if exists? Setting to false shall treat props along with project files.");
+
+            //WebhookUrl (Phase 3)
+            p.Setup(arg => arg.WebhookUrl)
+                .As('h', "webhookurl")
+                .SetDefault(string.Empty)
+                .WithDescription("Optional webhook URL for notifications. Tool works normally if webhook is not provided or fails.");
+
+            //WebhookToken (Phase 3)
+            p.Setup(arg => arg.WebhookToken)
+                .As('t', "webhooktoken")
+                .SetDefault(string.Empty)
+                .WithDescription("Optional HMAC secret for webhook signature verification. Only used if webhookurl is provided.");
+
+            //VersionItems (Phase 5)
+            p.Setup(arg => arg.VersionItems)
+                .As("versionitems")
+                .SetDefault(string.Empty)
+                .WithDescription("Comma-separated list of artifact types to version (e.g., 'nuget,npm,docker'). If not set, versions all artifacts. Supported: dotnet,props,nuget,npm,docker,python,go,rust,java,yaml,helm");
 
             ICommandLineParserResult result = p.Parse(args);
+
+            // Validate VersionItems parameter if provided
+            if (result.HasErrors == false && !string.IsNullOrWhiteSpace(p.Object.VersionItems))
+            {
+                var (isValid, _, errorMessage) = AnubisWorks.Tools.Versioner.Helper.VersionItemsParser.Parse(p.Object.VersionItems);
+                if (!isValid)
+                {
+                    Console.Error.WriteLine($"ERROR: {errorMessage}");
+                    DependentErrors = true;
+                }
+            }
+
+            // Normalize and validate file path parameters for cross-platform compatibility
+            if (result.HasErrors == false)
+            {
+                // Normalize and validate CustomConfigurationFile path
+                if (!string.IsNullOrWhiteSpace(p.Object.CustomConfigurationFile))
+                {
+                    string normalizedPath = FilePathHelper.NormalizePathForPlatform(p.Object.CustomConfigurationFile);
+                    p.Object.CustomConfigurationFile = normalizedPath;
+
+                    var validation = PathValidator.ValidatePath(normalizedPath, "CustomConfigurationFile", mustExist: false);
+                    if (!validation.IsValid)
+                    {
+                        Console.WriteLine($"ERROR: {validation.ErrorMessage}");
+                        DependentErrors = true;
+                    }
+                }
+
+                // Normalize and validate ProjectsGuidConfiguration path
+                if (!string.IsNullOrWhiteSpace(p.Object.ProjectsGuidConfiguration))
+                {
+                    string normalizedPath = FilePathHelper.NormalizePathForPlatform(p.Object.ProjectsGuidConfiguration);
+                    p.Object.ProjectsGuidConfiguration = normalizedPath;
+
+                    var validation = PathValidator.ValidatePath(normalizedPath, "ProjectsGuidConfiguration", mustExist: false);
+                    if (!validation.IsValid)
+                    {
+                        Console.WriteLine($"ERROR: {validation.ErrorMessage}");
+                        DependentErrors = true;
+                    }
+                }
+
+                // Normalize other file path parameters
+                if (!string.IsNullOrWhiteSpace(p.Object.ExactProjectFile))
+                {
+                    p.Object.ExactProjectFile = FilePathHelper.NormalizePathForPlatform(p.Object.ExactProjectFile);
+
+                    var validation = PathValidator.ValidatePath(p.Object.ExactProjectFile, "ExactProjectFile", mustExist: false);
+                    if (!validation.IsValid)
+                    {
+                        Console.WriteLine($"ERROR: {validation.ErrorMessage}");
+                        DependentErrors = true;
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(p.Object.WorkingFolder))
+                {
+                    p.Object.WorkingFolder = FilePathHelper.NormalizePathForPlatform(p.Object.WorkingFolder);
+
+                    var validation = PathValidator.ValidatePath(p.Object.WorkingFolder, "WorkingFolder", mustExist: false);
+                    if (!validation.IsValid)
+                    {
+                        Console.WriteLine($"ERROR: {validation.ErrorMessage}");
+                        DependentErrors = true;
+                    }
+                }
+            }
 
             if (result.HasErrors == false)
             {
@@ -123,11 +197,29 @@ namespace AnubisWorks.Tools.Versioner.Cli
                 //    }
                 //}
 
-                if(p.Object.IsMonoRepo && !string.IsNullOrEmpty(p.Object.CustomConfigurationFile))
+                // Validate IsMonoRepo conflicts with incompatible parameters
+                if (p.Object.IsMonoRepo)
                 {
-                    Console.WriteLine("If IsMonoRepo parameter is used, parameter CustomConfigurationFile cannot be used!");
-                    Console.WriteLine("CustomConfigurationFile parameter will be ignored!");
-                    p.Object.CustomConfigurationFile = null;
+                    bool hasConflict = false;
+
+                    if (!p.Object.UseDefaults)
+                    {
+                        Console.WriteLine("ERROR: IsMonoRepo parameter cannot be used when UseDefaults is false!");
+                        Console.WriteLine("IsMonoRepo mode requires UseDefaults to be enabled.");
+                        hasConflict = true;
+                    }
+
+                    if (!string.IsNullOrEmpty(p.Object.CustomConfigurationFile))
+                    {
+                        Console.WriteLine("ERROR: IsMonoRepo parameter cannot be used with CustomConfigurationFile parameter!");
+                        Console.WriteLine("These options are mutually exclusive. Please remove one of them.");
+                        hasConflict = true;
+                    }
+                    
+                    if (hasConflict)
+                    {
+                        DependentErrors = true;
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(p.Object.ExactProjectFile) && p.Object.AllSlnLocations)
@@ -137,13 +229,6 @@ namespace AnubisWorks.Tools.Versioner.Cli
                     p.Object.AllSlnLocations = false;
                 }
 
-                if (p.Object.SemVersion != 1 && p.Object.SemVersion != 2)
-                {
-                    Console.WriteLine("Wrong value for semversion switch! Please use 1 or 2.");
-                    Console.WriteLine($"Setting default SemVersion value = 1");
-                    p.Object.SemVersion = 1;
-                    //DependentErrors = true;
-                }
             }
 
             if (result.HasErrors == false && DependentErrors == false)
@@ -153,7 +238,7 @@ namespace AnubisWorks.Tools.Versioner.Cli
                 string projectGuidsConfig = p.Object.ProjectsGuidConfiguration;
                 string projectfile = p.Object.ExactProjectFile;
 
-                Console.WriteLine($"Options are ->  UseDefaults: {p.Object.UseDefaults}, WorkingFolder: {p.Object.WorkingFolder}, ConfigurationFile: {p.Object.ConfigurationFile}, Loglevel: {p.Object.LogLevel}, StoreVersionFile: {p.Object.StoreVersionFile}, SearchInAllLocationsForSln: {allSln}, SetProjectGuids: {setProjectGuids}, ProjectsGuidConfiguration: {projectGuidsConfig}, ExactProjectFile: {projectfile}");
+                Console.WriteLine($"Options are ->  UseDefaults: {p.Object.UseDefaults}, WorkingFolder: {p.Object.WorkingFolder}, Loglevel: {p.Object.LogLevel}, StoreVersionFile: {p.Object.StoreVersionFile}, SearchInAllLocationsForSln: {allSln}, SetProjectGuids: {setProjectGuids}, ProjectsGuidConfiguration: {projectGuidsConfig}, ExactProjectFile: {projectfile}");
             }
             else
             {
@@ -163,7 +248,7 @@ namespace AnubisWorks.Tools.Versioner.Cli
             }
 
             PrimalPerformer wker = new PrimalPerformer(p.Object);
-            wker.Execute();
+            wker.Execute().GetAwaiter().GetResult();
 
             return 0;
         }

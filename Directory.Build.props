@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -24,7 +24,7 @@
     <DelaySign>false</DelaySign>
     <PublicSign>false</PublicSign>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <InformationalVersion>8.1.0.0</InformationalVersion>
+    <InformationalVersion>10.0.0.0</InformationalVersion>
     <Copyright>Copyright (c) 2016-$([System.DateTime]::Now.Year) Michael Agata, AnubisWorks</Copyright>
     <Company>AnubisWorks</Company>
     <Authors>Michael Agata</Authors>
@@ -36,6 +36,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>versioning;semver;git;dotnet;cli</PackageTags>
     <PackageDescription>Advanced versioning tool for .NET projects with Git integration and semantic versioning support</PackageDescription>
+    <AssemblyInformationalVersion>1.0.0.0</AssemblyInformationalVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DebugType>full</DebugType>
@@ -54,9 +55,9 @@
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>9.1.345.32+d438748</Version>
-    <AssemblyVersion>9.1.345.32</AssemblyVersion>
-    <FileVersion>9.1.345.32</FileVersion>
-    <Description>ChangeHash:d438748,BuildLabel:REV_20251211_1215_d438748</Description>
+    <Version>10.2.6.44+92febe4</Version>
+    <AssemblyVersion>10.2.6.44</AssemblyVersion>
+    <FileVersion>10.2.6.44</FileVersion>
+    <Description>ChangeHash:92febe4,BuildLabel:REV_20260106_1757_92febe4</Description>
   </PropertyGroup>
 </Project>

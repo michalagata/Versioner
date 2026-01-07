@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using AnubisWorks.Tools.Versioner;
 using Serilog;
 using AnubisWorks.Tools.Versioner.Model;
 
@@ -28,7 +29,7 @@ namespace AnubisWorks.Tools.Versioner.Helper
                 Environment.Exit(603);
             }
 
-            if(fullLog4ProjectDir.soutput.Trim() == "")
+            if(string.IsNullOrWhiteSpace(fullLog4ProjectDir.soutput))
             {
                 log.Warning("git log for dir '{projDir}' is empty", projDir);
 

@@ -25,6 +25,60 @@ namespace AnubisWorks.Tools.Versioner.Helper
             return originalPath.NormalizeEscapings();
         }
 
+        /// <summary>
+        /// Normalizes file paths for cross-platform compatibility.
+        /// Converts Windows-style backslashes to forward slashes on Unix-like systems (Linux/macOS).
+        /// Preserves UNC paths and Windows absolute paths when on Windows.
+        /// </summary>
+        /// <param name="path">The path to normalize</param>
+        /// <returns>Normalized path with appropriate path separators for the current platform</returns>
+        public static string NormalizePathForPlatform(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+
+            // Remove quotes first (ArgsInterceptor may preserve quotes from command line)
+            // Trim quotes from both ends if present
+            string cleaned = path.Trim('"', '\'');
+
+            // Detect if we're on Unix-like system (Linux/macOS)
+            bool isUnix = Environment.OSVersion.Platform == PlatformID.Unix ||
+                         Environment.OSVersion.Platform == PlatformID.MacOSX ||
+                         Path.DirectorySeparatorChar == '/';
+
+            if (!isUnix)
+            {
+                // On Windows, return as-is (but still normalize escapings)
+                return cleaned.NormalizeEscapings();
+            }
+
+            // On Unix-like systems, normalize backslashes to forward slashes
+            // Note: On Unix, \\ at start is NOT a UNC path (UNC paths don't exist on Unix)
+            // So we treat \ as a potential absolute path indicator
+            
+            // Regular path - convert all backslashes to forward slashes
+            string normalized = cleaned.Replace('\\', '/');
+            
+            // Normalize double slashes (but keep single leading slash for absolute paths)
+            if (normalized.StartsWith("/"))
+            {
+                // Absolute path - keep single leading slash, normalize any double slashes after
+                normalized = "/" + normalized.TrimStart('/').Replace("//", "/");
+            }
+            else
+            {
+                // Relative path - normalize any double slashes
+                normalized = normalized.Replace("//", "/");
+            }
+
+            // Remove trailing slashes (consistent with NormalizeEscapings behavior)
+            normalized = normalized.TrimEnd('/', '\\');
+
+            return normalized;
+        }
+
         private static string NormalizeEscapings(this string source)
         {
             string rr = source;

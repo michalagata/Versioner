@@ -64,14 +64,13 @@ namespace AnubisWorks.Tools.Versioner.Entity
             File.Move(filePath, $"{filePath}.bak");
 
             File.WriteAllText($"{filePath}",
-                project.ToString(SaveOptions.None).Replace("-&gt;", "->")
-                    .Replace("<ProjectGuid xmlns=\"\">", "<ProjectGuid>"));
+                project.ToString(SaveOptions.None).Replace("-&gt;", "->"));
         }
 
         public void VersionTsFile(string filePath, string buildLabel, string shortHash,
             string assemblyVersion, string assemblyFileVersion, string assemblyInformationalVersion)
         {
-            string tsVersionFile = Path.Combine(Path.GetDirectoryName(filePath), "ClientApp\\src\\assemblyinfo.ts");
+            string tsVersionFile = Path.Combine(Path.GetDirectoryName(filePath), "ClientApp", "src", "assemblyinfo.ts");
             if (File.Exists(tsVersionFile))
             {
                 _log.Information("Generating TypeScript assemblyinfo.ts");
@@ -95,10 +94,12 @@ namespace AnubisWorks.Tools.Versioner.Entity
                 try
                 {
                     string vertxtpath = Path.Combine(projDir, "version.txt");
+                    string versionContent = assemblyVersion;
                     if (!string.IsNullOrEmpty(PrereleaseSuffix))
                     {
-                        File.WriteAllText(vertxtpath, assemblyVersion + "-" + PrereleaseSuffix);
+                        versionContent = assemblyVersion + "-" + PrereleaseSuffix;
                     }
+                    File.WriteAllText(vertxtpath, versionContent);
                 }
                 catch (Exception e)
                 {

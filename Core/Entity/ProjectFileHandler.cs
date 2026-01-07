@@ -24,7 +24,14 @@ namespace AnubisWorks.Tools.Versioner.Entity
             File.WriteAllText($"{filePath}",
                 project.ToString(SaveOptions.None).Replace("-&gt;", "->"));
 
-            FilePathHelper.RenameFile(filePath, assemblyVersion);
+            // Only rename file if it contains a version in its name
+            string fileName = Path.GetFileName(filePath);
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(filePath);
+            // Check if filename contains a version pattern (e.g., "package.1.0.0" or "package-1.0.0")
+            if (System.Text.RegularExpressions.Regex.IsMatch(fileNameWithoutExt, @"[\.\-]\d+\.\d+"))
+            {
+                FilePathHelper.RenameFile(filePath, assemblyVersion);
+            }
         }
 
         public void VersionCsProjFile(XDocument project, string filePath)
@@ -53,8 +60,7 @@ namespace AnubisWorks.Tools.Versioner.Entity
             File.Move(filePath, $"{filePath}.bak");
 
             File.WriteAllText($"{filePath}",
-                project.ToString(SaveOptions.None).Replace("-&gt;", "->")
-                    .Replace("<ProjectGuid xmlns=\"\">", "<ProjectGuid>"));
+                project.ToString(SaveOptions.None).Replace("-&gt;", "->"));
         }
 
         public void DecideProjectTypeFromFile(string filePath, ref ProjectType projectType,
@@ -74,12 +80,31 @@ namespace AnubisWorks.Tools.Versioner.Entity
             {
                 projectType = ProjectType.PackageJson;
             }
+            else if (filePath.EndsWith("Dockerfile") || filePath.EndsWith(".dockerfile") || 
+                     filePath.EndsWith("docker-compose.yml") || filePath.EndsWith("compose.yml") ||
+                     filePath.EndsWith(".yaml") || filePath.EndsWith(".yml"))
+            {
+                // These file types are handled by specialized services (DockerVersioningService, YamlVersioningService)
+                // and should not be parsed as XML
+                projectType = ProjectType.PackageJson; // Use a non-XML type to skip XML parsing
+                project = null;
+            }
             else
             {
-                project = XDocument.Parse(File.ReadAllText(filePath));
-                projectType = (project.XPathSelectElement("Project")?.Attribute("Sdk") != null)
-                    ? ProjectType.Sdk
-                    : ProjectType.AssemblyInfo;
+                // Only try to parse as XML if it's likely an XML file (.csproj, etc.)
+                try
+                {
+                    project = XDocument.Parse(File.ReadAllText(filePath));
+                    projectType = (project.XPathSelectElement("Project")?.Attribute("Sdk") != null)
+                        ? ProjectType.Sdk
+                        : ProjectType.AssemblyInfo;
+                }
+                catch (System.Xml.XmlException)
+                {
+                    // File is not valid XML, skip it
+                    projectType = ProjectType.PackageJson; // Use a non-XML type to skip XML parsing
+                    project = null;
+                }
             }
         }
     }

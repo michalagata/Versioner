@@ -8,10 +8,10 @@
 		]
 		},
 		{
-		"ProjectName": "Data.Crawler",
+		"ProjectName": "eKW.Host.Crawler",
 		"Directories": [
-		"DataInternal",
-		"Service/Data.Internal"
+		"eKW.Host.Internal",
+		"Service/eKW.Host.Internal"
 		]
 		}
 	]

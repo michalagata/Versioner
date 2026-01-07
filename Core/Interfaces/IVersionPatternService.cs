@@ -7,7 +7,6 @@ namespace AnubisWorks.Tools.Versioner.Interfaces
         string GenerateAssemblyVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,
@@ -18,7 +17,6 @@ namespace AnubisWorks.Tools.Versioner.Interfaces
         string GenerateAssemblyInfoVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,
@@ -29,7 +27,6 @@ namespace AnubisWorks.Tools.Versioner.Interfaces
         string GenerateAssemblyFileVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,

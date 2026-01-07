@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using AnubisWorks.Tools.Versioner.Domain.Interfaces;
 using AnubisWorks.Tools.Versioner.Entity;
 using AnubisWorks.Tools.Versioner.Helper;
 using AnubisWorks.Tools.Versioner.Interfaces;
@@ -19,19 +20,22 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         private readonly IVersionPatternService _versionPatternService;
         private readonly IProjectConfigurationService _projectConfigurationService;
         private readonly IProjectFileService _projectFileService;
+        private readonly IVersionPropertyInjector _versionPropertyInjector;
 
         public ProjectVersionCalculatorService(
             ILogger log,
             IGitLogService gitLogService,
             IVersionPatternService versionPatternService,
             IProjectConfigurationService projectConfigurationService,
-            IProjectFileService projectFileService)
+            IProjectFileService projectFileService,
+            IVersionPropertyInjector versionPropertyInjector)
         {
             _log = log;
             _gitLogService = gitLogService;
             _versionPatternService = versionPatternService;
             _projectConfigurationService = projectConfigurationService;
             _projectFileService = projectFileService;
+            _versionPropertyInjector = versionPropertyInjector;
         }
 
         public VersionedSetModel CalculateVersion(
@@ -43,15 +47,24 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
             bool storeVersionFile,
             MajorMinorPatchHotfixModel patchHotfixModel,
             CustomProjectSettings customProjectSettings,
-            int semVersion,
             string prereleaseSuffix,
             string definedPatch,
             bool calculateMonoMode = false)
         {
             Stopwatch sw = Stopwatch.StartNew();
             
-            var relative = Path.GetRelativePath(workingFolder, filePath).ToLinuxPath();
+            var relative = Path.GetRelativePath(workingFolder, filePath).NormalizePath();
             _log.Information("Loading file: {relative}", relative);
+
+            // Skip Dockerfile and YAML files - they are handled by specialized services
+            string fileName = Path.GetFileName(filePath).ToLowerInvariant();
+            if (fileName == "dockerfile" || fileName.EndsWith(".dockerfile") ||
+                fileName == "docker-compose.yml" || fileName == "compose.yml" ||
+                fileName.EndsWith(".yaml") || fileName.EndsWith(".yml"))
+            {
+                _log.Debug("Skipping {file} - handled by specialized service", relative);
+                return new VersionedSetModel(); // Return empty model for files handled elsewhere
+            }
 
             // Określenie typu projektu
             ProjectType projectType = ProjectType.Sdk;
@@ -112,13 +125,13 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
                 if (timeModel.Version.Hotfix != 0) pos2 = timeModel.Version.Hotfix.ToString();
             }
 
-            // Generowanie wzorców wersji
+            // Generowanie wzorców wersji (zawsze używamy SemVer V1)
             string assemblyVersionPattern = _versionPatternService.GenerateAssemblyVersionPattern(
-                config, timeModel, semVersion, pos0, pos1, pos2, pos3, pos4, pos5);
+                config, timeModel, pos0, pos1, pos2, pos3, pos4, pos5);
             string assemblyInfoVersionPattern = _versionPatternService.GenerateAssemblyInfoVersionPattern(
-                config, timeModel, semVersion, pos0, pos1, pos2, pos3, pos4, pos5);
+                config, timeModel, pos0, pos1, pos2, pos3, pos4, pos5);
             string assemblyFileVersionPattern = _versionPatternService.GenerateAssemblyFileVersionPattern(
-                config, timeModel, semVersion, pos0, pos1, pos2, pos3, pos4, pos5);
+                config, timeModel, pos0, pos1, pos2, pos3, pos4, pos5);
 
             // Obsługa PackageJson
             if (projectType == ProjectType.PackageJson)
@@ -183,8 +196,31 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
                     projectType, assemblyVersion, prereleaseSuffix);
             }
 
-            // Wersjonowanie plików
-            bool saveprops = false, savecsproj = false, saveNuSpec = false;
+            // Wstrzykiwanie właściwości wersji jeśli brakuje
+            bool versionPropertiesAdded = false;
+            if (projectType == ProjectType.Sdk || projectType == ProjectType.Props)
+            {
+                versionPropertiesAdded = _versionPropertyInjector.EnsureVersionPropertiesExist(
+                    project, projectType, defaultVersion);
+                
+                if (versionPropertiesAdded)
+                {
+                    _log.Information("Added missing version properties to {ProjectType} file: {FilePath}", 
+                        projectType, relative);
+                }
+            }
+
+            // Wersjonowanie plików - deklaracja zmiennych
+            bool saveprops = false;
+            bool savecsproj = false;
+            bool saveNuSpec = false;
+
+            // In standard mode, skip .props files - only version .csproj files
+            if (projectType == ProjectType.Props && !calculateMonoMode)
+            {
+                _log.Information("Skipping .props file in standard mode: {FilePath}", relative);
+                return new VersionedSetModel();
+            }
             
             if (string.IsNullOrEmpty(prereleaseSuffix))
             {
@@ -199,10 +235,21 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
                     filePath, assemblyInfoFilePath, prereleaseSuffix);
             }
 
-            // Obsługa GUID projektów
-            // ProjectGuid dotyczy wyłącznie plików CSPROJ (Sdk/AssemblyInfo). Props pomijamy.
-            if (State.MaintainProjectGuids &&
-                (projectType == ProjectType.Sdk || projectType == ProjectType.AssemblyInfo))
+            // Jeśli właściwości wersji zostały dodane, oznacz plik do zapisania
+            if (versionPropertiesAdded)
+            {
+                if (projectType == ProjectType.Props)
+                {
+                    saveprops = true;
+                }
+                else if (projectType == ProjectType.Sdk)
+                {
+                    savecsproj = true;
+                }
+            }
+
+            // Obsługa GUID projektów - tylko dla plików .csproj (ProjectType.Sdk)
+            if (State.MaintainProjectGuids && projectType == ProjectType.Sdk)
             {
                 if (ProjectEntityStatic.SetProjectGuid(project, relative))
                 {
@@ -245,7 +292,7 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         {
             Stopwatch sw = Stopwatch.StartNew();
             
-            var relative = Path.GetRelativePath(workingFolder, filePath).ToLinuxPath();
+            var relative = Path.GetRelativePath(workingFolder, filePath).NormalizePath();
             _log.Information("Loading file: {relative}", relative);
 
             ProjectType projectType = ProjectType.Sdk;
@@ -277,20 +324,17 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
             ProjectEntityStatic.ConsoleOutPutCalculatedVersions(ref tcOutputs, workingFolder, filePath, projectType,
                 assemblyVersion, assemblyInformationalVersion, assemblyFileVersion);
 
-            if (storeVersionFile)
-            {
-                _projectFileService.CreateVersionTextFile(storeVersionFile, Path.GetDirectoryName(filePath), 
-                    projectType, assemblyVersion);
-            }
+            // In monorepo mode, version.txt should be created only in repository root, not in each project directory
+            // This is handled by GlobalRepoVersioningService.VersionGlobalRepository (new monorepo mode)
+            // or by PrimalPerformer after all files are versioned (legacy monorepo mode)
+            // So we skip creating version.txt here in ProcessMonoRepoProject
 
             bool saveprops = false, savecsproj = false, saveNuSpec = false;
             ProjectEntityStatic.VersionFile(ref saveprops, ref savecsproj, ref saveNuSpec, project, config, 
                 projectType, description, assemblyFileVersion, assemblyVersion, assemblyInformationalVersion, 
                 filePath, "");
 
-            // ProjectGuid dotyczy wyłącznie plików CSPROJ (Sdk/AssemblyInfo). Props pomijamy.
-            if (State.MaintainProjectGuids &&
-                (projectType == ProjectType.Sdk || projectType == ProjectType.AssemblyInfo))
+            if (State.MaintainProjectGuids && projectType == ProjectType.Sdk)
             {
                 if (ProjectEntityStatic.SetProjectGuid(project, relative)) savecsproj = true;
             }

@@ -11,7 +11,6 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         public string GenerateAssemblyVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,
@@ -21,22 +20,17 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         {
             if (!timeModel.OverrideWithLocalFile)
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyVersionFormatV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5);
             }
             else
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyVersionFormatOverrideV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5);
             }
         }
 
         public string GenerateAssemblyInfoVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,
@@ -46,22 +40,17 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         {
             if (!timeModel.OverrideWithLocalFile)
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyInfoVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyInfoVersionFormatV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyInfoVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5);
             }
             else
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyInfoVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyInfoVersionFormatOverrideV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyInfoVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5);
             }
         }
 
         public string GenerateAssemblyFileVersionPattern(
             VersioningBaseConfiguration config,
             TimeModel timeModel,
-            int semVersion,
             string pos0,
             string pos1,
             string pos2,
@@ -71,15 +60,11 @@ namespace AnubisWorks.Tools.Versioner.Infrastructure.Services
         {
             if (!timeModel.OverrideWithLocalFile)
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyFileVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyFileVersionFormatV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyFileVersionFormat, pos0, pos1, pos2, pos3, pos4, pos5);
             }
             else
             {
-                return semVersion == 1
-                    ? string.Format(config.AssemblyFileVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5)
-                    : string.Format(config.AssemblyFileVersionFormatOverrideV2, pos0, pos1, pos2, pos3, pos4, pos5);
+                return string.Format(config.AssemblyFileVersionFormatOverride, pos0, pos1, pos2, pos3, pos4, pos5);
             }
         }
 

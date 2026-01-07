@@ -13,5 +13,7 @@ namespace AnubisWorks.Tools.Versioner.Interfaces
         List<GitLogEntry> GetGitLogs(string workingDirectory);
         string GetBuildLabel(string workingDirectory);
         string GetGitHash(string workingDirectory);
+        string GetGitRepositoryRoot(string workingDirectory);
+        bool IsGitRepository(string directory);
     }
 } 

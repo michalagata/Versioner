@@ -14,14 +14,31 @@ namespace AnubisWorks.Tools.Versioner.Services
         string LoadConfiguration(string configurationFile, IFileOperations fileOperations);
         string FillConfigWithDefaults(string json, ILogger log);
         void InitializeConfiguration(string configuration, ILogger log);
+        ConfigurationValidationResult ValidateConfiguration(string configurationJson);
     }
 
     public class ConfigurationService : IConfigurationService
     {
+        private readonly ConfigurationValidator _validator;
+
+        public ConfigurationService()
+        {
+            _validator = new ConfigurationValidator(Log.ForContext<ConfigurationService>());
+        }
+
+        public ConfigurationService(ILogger logger)
+        {
+            _validator = new ConfigurationValidator(logger ?? Log.ForContext<ConfigurationService>());
+        }
+
         public string LoadConfiguration(string configurationFile, IFileOperations fileOperations)
         {
             if (!string.IsNullOrWhiteSpace(configurationFile))
             {
+                if (!fileOperations.FileExists(configurationFile))
+                {
+                    throw new FileNotFoundException($"Configuration file not found: {configurationFile}");
+                }
                 return fileOperations.ReadFileContent(configurationFile);
             }
             return "{}";
@@ -70,6 +87,28 @@ namespace AnubisWorks.Tools.Versioner.Services
             try
             {
                 log.Information("Parsing commandline config");
+                
+                // Validate configuration before processing
+                var validationResult = ValidateConfiguration(configStr);
+                if (validationResult.HasErrors)
+                {
+                    log.Error("Configuration validation failed:");
+                    foreach (var error in validationResult.Errors)
+                    {
+                        log.Error("  - {error}", error);
+                    }
+                    throw new InvalidOperationException("Configuration validation failed. See errors above.");
+                }
+
+                if (validationResult.HasWarnings)
+                {
+                    log.Warning("Configuration validation warnings:");
+                    foreach (var warning in validationResult.Warnings)
+                    {
+                        log.Warning("  - {warning}", warning);
+                    }
+                }
+
                 configStr = FillConfigWithDefaults(configStr, log);
                 State.Config = JObject.Parse(configStr).ToObject<Configuration>();
             }
@@ -78,6 +117,11 @@ namespace AnubisWorks.Tools.Versioner.Services
                 log.Error("Error deserializing config Use command line. {msg}", e.Message);
                 Environment.Exit(500);
             }
+        }
+
+        public ConfigurationValidationResult ValidateConfiguration(string configurationJson)
+        {
+            return _validator.Validate(configurationJson);
         }
     }
 } 
