@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ProjectGuid>{bc2f8c0a-5f94-4400-864f-1e80a4c36f2a}</ProjectGuid>
     <OutputType>Library</OutputType>
     <LangVersion>latest</LangVersion>
     <TargetFramework>net10.0</TargetFramework>
@@ -20,7 +21,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyInformationalVersion>1.0.0.0</AssemblyInformationalVersion>
+    <AssemblyInformationalVersion>28.2601.23.25</AssemblyInformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LibGit2Sharp" />
@@ -41,9 +42,9 @@
     <ProjectReference Include="..\Core\Versioner.csproj" />
   </ItemGroup>
   <PropertyGroup>
-    <Version>10.2.7.8+74d9cb0</Version>
-    <AssemblyVersion>10.2.7.8</AssemblyVersion>
-    <FileVersion>10.2.7.8</FileVersion>
-    <Description>ChangeHash:74d9cb0,BuildLabel:REV_20260107_1153_74d9cb0|ChangeHash:e4ec123,BuildLabel:REV_20260107_1128_e4ec123</Description>
+    <Version>28.2601.23.32+e6e7294</Version>
+    <AssemblyVersion>28.2601.23.32</AssemblyVersion>
+    <FileVersion>28.2601.23.32</FileVersion>
+    <Description>ChangeHash:e6e7294,BuildLabel:REV_20260127_0928_96dac98</Description>
   </PropertyGroup>
 </Project>
