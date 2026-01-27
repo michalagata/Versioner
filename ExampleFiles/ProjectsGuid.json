@@ -1,4 +1,5 @@
 {
+  "StateChanged": true,
   "Entities": [
     {
       "ProjectHash": "4951be3fff8571eb2d3f3d654c18f9a001511add336d5bf81b085e44d3f7c51a",
@@ -7,6 +8,30 @@
     {
       "ProjectHash": "04ec3510286fb9111b7e9fdcfe4aa15d2baa9a60079f1580f2fdade2be28b9e3",
       "ProjectGuid": "{892fc117-332c-4ee0-9f43-4c2a6fa87504}"
+    },
+    {
+      "ProjectHash": "7e6971020577e3a3c7afceb15282e2e434b8ebbcd66e9c6a4f4b29d5daacf8ea",
+      "ProjectGuid": "{36af8bdf-4e18-4dd3-bbfe-ffe01d32eb1a}"
+    },
+    {
+      "ProjectHash": "7e5a5b61df2bda2bfc4a0950acbc948466703271c17c659341c36bead63fd502",
+      "ProjectGuid": "{bf6d67a0-fc79-4472-ae0e-29418e8cd69e}"
+    },
+    {
+      "ProjectHash": "6dfbbdf29fed50162c78bdb289d0a5f30de55172b7e8add7a8f2846cdb9d23c9",
+      "ProjectGuid": "{7f9a0933-a214-4605-8fba-178d00454284}"
+    },
+    {
+      "ProjectHash": "15eccb1f1aefeea3ae3a2fade834cf53efa292da8c45aa7791deea1c8445c912",
+      "ProjectGuid": "{cbc9ef0b-37ed-48ae-99b0-9fc60b49f2e3}"
+    },
+    {
+      "ProjectHash": "fc403726cac4cd3f7026f6740120ae3a82861046979e68326e251f8a29b98e08",
+      "ProjectGuid": "{e4794efe-771c-4af3-8b75-01b57daf231b}"
+    },
+    {
+      "ProjectHash": "eecfae03faee59d7236af892f887c052207776c44493e146a6ee2457390b264f",
+      "ProjectGuid": "{bc2f8c0a-5f94-4400-864f-1e80a4c36f2a}"
     }
   ]
 }
