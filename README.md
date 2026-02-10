@@ -72,6 +72,14 @@ Versioner automatically generates semantic versions based on:
 - **Java**: `pom.xml`, `build.gradle`
 - **Kubernetes/Helm**: `Chart.yaml`, YAML manifests
 
+### Docker ImageTag Generation (NEW)
+- **Automatic Docker tag creation** based on git branch and commit
+- **Branch-aware tags**: Distinguishes Release (R), Development (D), and Feature (FB) branches
+- **Deterministic format**: `(FB|D|R)_REV_(date)_(hour)_(hash)` - same commit = same tag
+- **CI/CD ready**: Outputs TeamCity parameters for pipeline integration
+- **Traceable**: Includes commit hash and timestamp for easy identification
+- **Example**: `FB_REV_20260209_1058_b1f60c67` for feature branches
+
 ---
 
 ## Installation
@@ -529,6 +537,250 @@ versioner -w .
 28.2601.023.114
 ```
 
+**Best practice**:
+- Use `-s` in CI/CD pipelines
+- Commit `version.txt` to track version history
+- Use for GitHub releases, Docker tags, deployment tracking
+
+---
+
+#### `--produceimagetag`
+
+**Description**: Generate Docker ImageTag based on git branch and commit information.
+
+**Purpose**: Create deterministic, traceable Docker image tags for CI/CD pipelines.
+
+**Default value**: `false` (disabled)
+
+**Usage:**
+```bash
+# Enable ImageTag generation
+versioner -w . --produceimagetag
+
+# Combined with other options
+versioner -w . --produceimagetag -s
+```
+
+**ImageTag Format:**
+```
+(FB|D|R)_REV_(date)_(hour)_(short_hash)
+```
+
+**Branch Type Prefixes:**
+- **R** - Release branches (`master`, `main`)
+- **D** - Development branches (`devel`, `develop`, `development`)
+- **FB** - Feature branches (all other branches)
+
+**Output:**
+- TeamCity parameter: `##teamcity[setParameter name='ImageTag' value='...']`
+- Can be used in Docker build commands
+
+**Examples:**
+
+*Feature Branch:*
+```bash
+# Branch: feature/new-feature
+# Commit: 2026-02-09 10:58:34 (b1f60c67)
+versioner -w . --produceimagetag
+
+# Output: ##teamcity[setParameter name='ImageTag' value='FB_REV_20260209_1058_b1f60c67']
+# Docker usage: docker build -t myapp:FB_REV_20260209_1058_b1f60c67 .
+```
+
+*Development Branch:*
+```bash
+# Branch: devel
+# Commit: 2026-02-09 14:23:45 (a3e5f2d9)
+versioner -w . --produceimagetag
+
+# Output: ##teamcity[setParameter name='ImageTag' value='D_REV_20260209_1423_a3e5f2d9']
+# Docker usage: docker build -t myapp:D_REV_20260209_1423_a3e5f2d9 .
+```
+
+*Release Branch:*
+```bash
+# Branch: master
+# Commit: 2026-02-10 09:15:22 (c8b4a1e3)
+versioner -w . --produceimagetag
+
+# Output: ##teamcity[setParameter name='ImageTag' value='R_REV_20260210_0915_c8b4a1e3']
+# Docker usage: docker build -t myapp:R_REV_20260210_0915_c8b4a1e3 .
+```
+
+**CI/CD Integration:**
+```bash
+# TeamCity, Jenkins, GitHub Actions
+versioner -w . --produceimagetag -s
+
+# Extract ImageTag for Docker build
+IMAGE_TAG=$(versioner -w . --produceimagetag | grep 'ImageTag' | cut -d"'" -f4)
+docker build -t myapp:${IMAGE_TAG} .
+docker push myapp:${IMAGE_TAG}
+```
+
+**Benefits:**
+- **Deterministic**: Same commit = same tag, always
+- **Traceable**: Tag includes commit hash for easy tracking
+- **Branch-aware**: Immediately identifies branch type (release/dev/feature)
+- **Chronological**: Date and time embedded in tag
+- **CI/CD friendly**: Works with TeamCity, Jenkins, GitHub Actions, GitLab CI
+
+**Notes:**
+- ImageTag generation uses repository root git information
+- Non-fatal errors (continues if git operations fail)
+- Case-insensitive branch name matching (`MASTER` = `master` = `Master`)
+- Branch names are trimmed (whitespace removed)
+
+---
+
+#### `--add-output-parameters`
+
+**Description**: Add `##outputparameters` format alongside standard `##teamcity` format in console output.
+
+**Purpose**: Enable broader CI/CD compatibility by outputting parameters in both TeamCity Service Messages format and a generic output parameters format.
+
+**Default value**: `false` (disabled - only `##teamcity` format is output)
+
+**Behavior:**
+- **`false` (default)**: Only `##teamcity[setParameter ...]` format is output
+- **`true`**: Both `##teamcity[setParameter ...]` AND `##outputparameters[setParameter ...]` formats are output
+
+**Usage:**
+```bash
+# Enable dual-format output
+versioner -w . --add-output-parameters
+
+# Combined with other options
+versioner -w . --add-output-parameters -s --produceimagetag
+```
+
+**Output Format Comparison:**
+
+*Without `--add-output-parameters` (default):*
+```bash
+versioner -w .
+
+# Output:
+##teamcity[setParameter name='Version.Core' value='1.2026.10.5']
+##teamcity[setParameter name='VersionInfo.Core' value='1.2026.10.5+abc1234']
+##teamcity[setParameter name='VersionFile.Core' value='1.2026.10.5']
+```
+
+*With `--add-output-parameters`:*
+```bash
+versioner -w . --add-output-parameters
+
+# Output:
+##teamcity[setParameter name='Version.Core' value='1.2026.10.5']
+##teamcity[setParameter name='VersionInfo.Core' value='1.2026.10.5+abc1234']
+##teamcity[setParameter name='VersionFile.Core' value='1.2026.10.5']
+##outputparameters[setParameter name='Version.Core' value='1.2026.10.5']
+##outputparameters[setParameter name='VersionInfo.Core' value='1.2026.10.5+abc1234']
+##outputparameters[setParameter name='VersionFile.Core' value='1.2026.10.5']
+```
+
+**Affected Output Parameters:**
+
+All version-related outputs will produce both formats:
+- `Version.*` - Assembly version
+- `VersionInfo.*` - Informational version (with metadata)
+- `VersionFile.*` - File version
+- `env.BuildLabel` - Build label
+- `env.ArtifactVersion` - Artifact version
+- `env.DockerBuildLabel` - Docker version
+- `env.BuildNuspecVersion` - NuGet package version
+- `ImageTag` - Docker ImageTag (when using `--produceimagetag`)
+
+**CI/CD Integration Examples:**
+
+*TeamCity (standard - no flag needed):*
+```bash
+# TeamCity automatically parses ##teamcity format
+versioner -w . -s
+# Uses: ##teamcity[setParameter name='Version.Core' value='...']
+```
+
+*Generic CI/CD (with dual-format output):*
+```bash
+# Output both formats for broader compatibility
+versioner -w . -s --add-output-parameters
+
+# Parse ##outputparameters format (if tool doesn't support TeamCity format)
+VERSION=$(versioner -w . --add-output-parameters | grep '##outputparameters.*Version\.Core' | cut -d"'" -f4)
+echo "Extracted version: ${VERSION}"
+```
+
+*GitHub Actions (using both formats):*
+```yaml
+- name: Calculate Version
+  id: version
+  run: |
+    versioner -w . --add-output-parameters -s
+    
+    # Parse either format (TeamCity or OutputParameters)
+    VERSION=$(grep '##teamcity.*Version\.Core' output.log | cut -d"'" -f4)
+    echo "version=${VERSION}" >> $GITHUB_OUTPUT
+```
+
+*Jenkins Pipeline:*
+```groovy
+pipeline {
+    stages {
+        stage('Version') {
+            steps {
+                script {
+                    // Enable dual-format output
+                    sh 'versioner -w . --add-output-parameters -s'
+                    
+                    // Parse ##outputparameters format
+                    def version = sh(
+                        script: "grep '##outputparameters.*Version' output.log | cut -d\"'\" -f4",
+                        returnStdout: true
+                    ).trim()
+                    
+                    env.BUILD_VERSION = version
+                }
+            }
+        }
+    }
+}
+```
+
+**Use Cases:**
+
+1. **Non-TeamCity CI/CD systems**: Enable broader compatibility with CI/CD tools that don't natively support TeamCity Service Messages format
+
+2. **Custom tooling**: Organizations with custom build scripts that parse output parameter formats
+
+3. **Gradual migration**: Teams migrating from TeamCity to other CI/CD platforms can maintain both formats during transition
+
+4. **Multi-platform builds**: Projects building across multiple CI/CD platforms (TeamCity + GitHub Actions + Jenkins) can use the same versioner command
+
+**Backward Compatibility:**
+
+- **Default behavior unchanged**: Without `--add-output-parameters`, only `##teamcity` format is output (100% backward compatible)
+- **TeamCity integration preserved**: `##teamcity` format is ALWAYS output (even with `--add-output-parameters=true`)
+- **No breaking changes**: Existing scripts and pipelines continue to work without modification
+- **Opt-in only**: New format is only added when explicitly requested via CLI flag
+
+**Performance Impact:**
+- Negligible (doubles console output lines, but modern CI/CD systems handle this easily)
+- No impact on version calculation or file operations
+- Recommended for all use cases where TeamCity format isn't natively supported
+
+**Best Practices:**
+- Use default behavior (no flag) if working exclusively with TeamCity
+- Enable `--add-output-parameters` when:
+  - Using non-TeamCity CI/CD systems (GitHub Actions, Jenkins, GitLab CI)
+  - Building custom tooling that needs to parse output
+  - Supporting multiple CI/CD platforms simultaneously
+- Always combine with `-s` flag in CI/CD pipelines for version.txt generation
+
+**Notes:**
+- Both formats contain identical values (version synchronization guaranteed)
+- Format: `##outputparameters[setParameter name='...' value='...']` (follows same structure as TeamCity format)
+- Non-breaking: existing code that parses `##teamcity` format continues to work unchanged
+
 ---
 
 #### `-l, --loglevel <level>` (Recommended)
@@ -777,6 +1029,52 @@ versioner -w . -m -a -s
 
 ---
 
+### Parameter Format Support
+
+**All command-line parameters** support both `=` and `:` as value separators:
+
+```bash
+# Both formats are equivalent and fully supported:
+--parameter=value
+--parameter:value
+
+# With quotes (for values containing spaces or special characters):
+--parameter="value with spaces"
+--parameter:"value with spaces"
+
+# Short form parameters:
+-u=config.json
+-u:config.json
+-u="config.json"
+-u:"config.json"
+```
+
+**Examples across different parameters:**
+
+```bash
+# Configuration repository (all equivalent):
+--configuration-repository=https://git.example.com/config.git
+--configuration-repository:https://git.example.com/config.git
+--configuration-repository="https://git.example.com/config.git"
+--configuration-repository:"https://git.example.com/config.git"
+
+# Project file path (all equivalent):
+--projectfile=/path/to/project.csproj
+--projectfile:/path/to/project.csproj
+-p=/path/to/project.csproj
+-p:/path/to/project.csproj
+
+# Custom config file (all equivalent):
+--customprojectconfig=config.json
+--customprojectconfig:config.json
+-u=config.json
+-u:config.json
+```
+
+**Implementation**: The tool automatically normalizes `:` to `=` internally, ensuring consistent behavior across all parameter formats.
+
+---
+
 ### Configuration File Parameters
 
 #### `-u, --customprojectconfig <path>`
@@ -825,14 +1123,15 @@ versioner -w . -s
 - Share code between projects (e.g., "Shared/Common" affects both)
 - Fine-tune commit counting for complex repository structures
 
-**⚠️ Incompatibility with MonoRepo:**
-When explicitly provided by user AND using MonoRepo mode, error occurs:
+**⚠️ Behavior in MonoRepo Mode:**
+When using MonoRepo mode (`--ismonorepo`), the `-u` parameter is **automatically ignored**:
 ```bash
 versioner -w . -m -u config.json
-# ERROR: IsMonoRepo parameter cannot be used with CustomConfigurationFile parameter!
+# WARNING: CustomConfigurationFile (-u/--customprojectconfig) is ignored in MonoRepo mode (--ismonorepo).
+#          MonoRepo mode uses per-project configuration discovery. The -u parameter has been cleared.
 ```
 
-**Solution**: Don't explicitly provide `-u` in MonoRepo mode (default value is okay).
+**Note**: MonoRepo mode uses per-project configuration files (ProjectCustomSettings.json) discovered automatically. Global `-u` configuration is incompatible with this approach, so it's silently cleared with a warning.
 
 ---
 
@@ -2139,21 +2438,25 @@ versioner -w /correct/path/to/repo -s
 
 ---
 
-### Issue 2: MonoRepo error with -u parameter
+### Issue 2: MonoRepo warning with -u parameter
 
 **Symptom:**
 ```
-ERROR: IsMonoRepo parameter cannot be used with CustomConfigurationFile parameter!
+WARNING: CustomConfigurationFile (-u/--customprojectconfig) is ignored in MonoRepo mode (--ismonorepo).
+         MonoRepo mode uses per-project configuration discovery. The -u parameter has been cleared.
 ```
 
 **Cause**: Parameter `-u` explicitly provided with MonoRepo mode.
 
-**Solution:**
+**Info**: This is informational only - tool continues execution. MonoRepo mode automatically discovers per-project configuration files (ProjectCustomSettings.json) and ignores global `-u` configuration.
+
+**Action**: No action needed - this is expected behavior. If you want to suppress the warning, simply don't provide `-u` in MonoRepo mode:
 ```bash
-# Don't explicitly provide -u in MonoRepo mode
+# Recommended: omit -u in MonoRepo mode
 versioner -w . -m -s
 
-# Default value is used automatically
+# Will show warning but works fine:
+versioner -w . -m -s -u config.json
 ```
 
 ---
