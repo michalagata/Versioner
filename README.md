@@ -635,19 +635,19 @@ docker push myapp:${IMAGE_TAG}
 
 #### `--add-output-parameters`
 
-**Description**: Add `##outputparameters` format alongside standard `##teamcity` format in console output.
+**Description**: Switch console output format from `##teamcity` (default) to `##outputparameters` format.
 
-**Purpose**: Enable broader CI/CD compatibility by outputting parameters in both TeamCity Service Messages format and a generic output parameters format.
+**Purpose**: Enable broader CI/CD compatibility by using generic output parameters format instead of TeamCity-specific Service Messages format.
 
 **Default value**: `false` (disabled - only `##teamcity` format is output)
 
 **Behavior:**
-- **`false` (default)**: Only `##teamcity[setParameter ...]` format is output
-- **`true`**: Both `##teamcity[setParameter ...]` AND `##outputparameters[setParameter ...]` formats are output
+- **`false` (default)**: Only `##teamcity[setParameter ...]` format is output (backward compatible)
+- **`true`**: Only `##outputparameters[setParameter ...]` format is output (replaces ##teamcity)
 
 **Usage:**
 ```bash
-# Enable dual-format output
+# Use generic output format (non-TeamCity CI/CD)
 versioner -w . --add-output-parameters
 
 # Combined with other options
@@ -656,7 +656,7 @@ versioner -w . --add-output-parameters -s --produceimagetag
 
 **Output Format Comparison:**
 
-*Without `--add-output-parameters` (default):*
+*Without `--add-output-parameters` (default - TeamCity format):*
 ```bash
 versioner -w .
 
@@ -666,14 +666,11 @@ versioner -w .
 ##teamcity[setParameter name='VersionFile.Core' value='1.2026.10.5']
 ```
 
-*With `--add-output-parameters`:*
+*With `--add-output-parameters` (generic format):*
 ```bash
 versioner -w . --add-output-parameters
 
 # Output:
-##teamcity[setParameter name='Version.Core' value='1.2026.10.5']
-##teamcity[setParameter name='VersionInfo.Core' value='1.2026.10.5+abc1234']
-##teamcity[setParameter name='VersionFile.Core' value='1.2026.10.5']
 ##outputparameters[setParameter name='Version.Core' value='1.2026.10.5']
 ##outputparameters[setParameter name='VersionInfo.Core' value='1.2026.10.5+abc1234']
 ##outputparameters[setParameter name='VersionFile.Core' value='1.2026.10.5']
@@ -681,7 +678,7 @@ versioner -w . --add-output-parameters
 
 **Affected Output Parameters:**
 
-All version-related outputs will produce both formats:
+All version-related outputs will use the selected format:
 - `Version.*` - Assembly version
 - `VersionInfo.*` - Informational version (with metadata)
 - `VersionFile.*` - File version
@@ -700,12 +697,12 @@ versioner -w . -s
 # Uses: ##teamcity[setParameter name='Version.Core' value='...']
 ```
 
-*Generic CI/CD (with dual-format output):*
+*Generic CI/CD (with ##outputparameters format):*
 ```bash
-# Output both formats for broader compatibility
+# Use generic format for non-TeamCity systems
 versioner -w . -s --add-output-parameters
 
-# Parse ##outputparameters format (if tool doesn't support TeamCity format)
+# Parse ##outputparameters format
 VERSION=$(versioner -w . --add-output-parameters | grep '##outputparameters.*Version\.Core' | cut -d"'" -f4)
 echo "Extracted version: ${VERSION}"
 ```
@@ -748,36 +745,37 @@ pipeline {
 
 **Use Cases:**
 
-1. **Non-TeamCity CI/CD systems**: Enable broader compatibility with CI/CD tools that don't natively support TeamCity Service Messages format
+1. **Non-TeamCity CI/CD systems**: Use generic format for CI/CD tools that don't natively support TeamCity Service Messages format (GitHub Actions, Jenkins, GitLab CI, etc.)
 
-2. **Custom tooling**: Organizations with custom build scripts that parse output parameter formats
+2. **Custom tooling**: Organizations with custom build scripts that parse generic output parameter formats
 
-3. **Gradual migration**: Teams migrating from TeamCity to other CI/CD platforms can maintain both formats during transition
+3. **Migration from TeamCity**: Teams migrating from TeamCity to other CI/CD platforms can switch to generic format
 
-4. **Multi-platform builds**: Projects building across multiple CI/CD platforms (TeamCity + GitHub Actions + Jenkins) can use the same versioner command
+4. **Multi-platform builds**: Projects building across multiple CI/CD platforms can choose appropriate format per platform
 
 **Backward Compatibility:**
 
 - **Default behavior unchanged**: Without `--add-output-parameters`, only `##teamcity` format is output (100% backward compatible)
-- **TeamCity integration preserved**: `##teamcity` format is ALWAYS output (even with `--add-output-parameters=true`)
+- **TeamCity integration preserved**: Default behavior maintains TeamCity compatibility
 - **No breaking changes**: Existing scripts and pipelines continue to work without modification
-- **Opt-in only**: New format is only added when explicitly requested via CLI flag
+- **Opt-in only**: Generic format is only used when explicitly requested via CLI flag
 
 **Performance Impact:**
-- Negligible (doubles console output lines, but modern CI/CD systems handle this easily)
+- No performance impact (same number of output lines, just different format prefix)
 - No impact on version calculation or file operations
-- Recommended for all use cases where TeamCity format isn't natively supported
+- Safe for all use cases
 
 **Best Practices:**
 - Use default behavior (no flag) if working exclusively with TeamCity
 - Enable `--add-output-parameters` when:
   - Using non-TeamCity CI/CD systems (GitHub Actions, Jenkins, GitLab CI)
-  - Building custom tooling that needs to parse output
-  - Supporting multiple CI/CD platforms simultaneously
+  - Building custom tooling that parses generic parameter format
+  - TeamCity-specific format is not required
 - Always combine with `-s` flag in CI/CD pipelines for version.txt generation
 
 **Notes:**
-- Both formats contain identical values (version synchronization guaranteed)
+- Both formats contain identical values (only the prefix changes: `##teamcity` vs `##outputparameters`)
+- Choose based on your CI/CD platform requirements
 - Format: `##outputparameters[setParameter name='...' value='...']` (follows same structure as TeamCity format)
 - Non-breaking: existing code that parses `##teamcity` format continues to work unchanged
 
