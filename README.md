@@ -30,7 +30,7 @@
 Versioner automatically generates semantic versions based on:
 - **Git commit history** - Build number from commit count in directory or repository
 - **Current date/time** - Minor (YYMM) and Patch (day-of-year) from system timestamp
-- **Calculated major version** - From year digit-sum or preserved from existing files
+- **Calculated major version** - From year offset (year - 1998) or preserved from existing files
 - **Override files** - Manual control via `ProjectOverride.json` when needed
 
 ### Why Versioner?
@@ -120,11 +120,11 @@ Versioner supports two version formats depending on artifact type:
 │  │    │   └─── W (Build): Commit count (114 commits)
 │  │    └─────── Z (Patch): Day of year (023 = January 23)
 │  └──────────── Y (Minor): Year-Month as YYMM (2601 = January 2026)
-└──────────────── X (Major): Year digit-sum (2+0+2+6 = 10) or preserved
+└──────────────── X (Major): Year offset (2026 - 1998 = 28) or preserved
 ```
 
 **Component Calculation:**
-- **X (Major)**: Digit-sum from current year (2026 → 2+0+2+6 = 10) OR preserved from existing version
+- **X (Major)**: Year offset (2026 - 1998 = 28) OR preserved from existing version
 - **Y (Minor)**: YYMM format - 4 digits representing year and month (January 2026 → `2601`)
 - **Z (Patch)**: Day of year in DDD format (001-366, zero-padded) - January 23 → `023`
 - **W (Build)**: Commit count in directory (Classic mode) or repository root (MonoRepo mode)
@@ -135,7 +135,7 @@ Versioner supports two version formats depending on artifact type:
 28.2601.114
 │  │    └─────── W (Build): Commit count (114 commits)
 │  └──────────── Y (Minor): Year-Month as YYMM (2601 = January 2026)
-└──────────────── X (Major): Year digit-sum or preserved
+└──────────────── X (Major): Year offset (year - 1998) or preserved
 ```
 
 **Note**: The Z (Patch/Day) component is **omitted** in 3-component format for compatibility with semantic versioning used by npm, Docker, etc.
@@ -177,9 +177,9 @@ In Classic Mode, each artifact is versioned **independently** based on its direc
    { "Major": 1, "Minor": 0, "Patch": 0, "Hotfix": 0 }
    ```
 
-4. **CALCULATED**: Digit-sum from current year
+4. **CALCULATED**: Year offset (year - 1998)
    ```
-   2026 → 2 + 0 + 2 + 6 = 10
+   2026 → 2026 - 1998 = 28
    ```
 
 #### Y (Minor) Component Priority:
@@ -342,14 +342,14 @@ docker/version.txt          → 28.2601.12       (Docker image)
 
 **Calculation:**
 ```
-X (Major):  2026 → 2+0+2+6 = 10 (digit-sum)
+X (Major):  2026 - 1998 = 28 (year offset)
 Y (Minor):  January 2026 → 2601 (YYMM)
 Z (Patch):  January 23 → 023 (day-of-year)
 W (Build):  git log count in directory
 
 Result:
-  Cli/Versioner.Cli.csproj  → 10.2601.023.31
-  Core/Versioner.csproj     → 10.2601.023.59
+  Cli/Versioner.Cli.csproj  → 28.2601.023.31
+  Core/Versioner.csproj     → 28.2601.023.59
 ```
 
 #### Example 2: Classic Mode, With Local Override
@@ -369,11 +369,11 @@ Cli artifact:
   Result: 1.2601.023.31
 
 Core artifact:
-  X (Major):  10 (calculated - no override)
+  X (Major):  28 (calculated - no override)
   Y (Minor):  2601 (calculated)
   Z (Patch):  023 (calculated)
   W (Build):  59 (calculated)
-  Result: 10.2601.023.59
+  Result: 28.2601.023.59
 ```
 
 #### Example 3: MonoRepo Mode, "Preserve Major"
@@ -573,6 +573,7 @@ versioner -w . --produceimagetag -s
 
 **Output:**
 - TeamCity parameter: `##teamcity[setParameter name='ImageTag' value='...']`
+- Environment variable: `VERSIONER_IMAGETAG` is set to the generated tag
 - Can be used in Docker build commands
 
 **Examples:**
@@ -612,7 +613,12 @@ versioner -w . --produceimagetag
 # TeamCity, Jenkins, GitHub Actions
 versioner -w . --produceimagetag -s
 
-# Extract ImageTag for Docker build
+# Use VERSIONER_IMAGETAG environment variable directly
+versioner -w . --produceimagetag -s
+docker build -t myapp:${VERSIONER_IMAGETAG} .
+docker push myapp:${VERSIONER_IMAGETAG}
+
+# Alternative: extract ImageTag from console output
 IMAGE_TAG=$(versioner -w . --produceimagetag | grep 'ImageTag' | cut -d"'" -f4)
 docker build -t myapp:${IMAGE_TAG} .
 docker push myapp:${IMAGE_TAG}
@@ -627,9 +633,100 @@ docker push myapp:${IMAGE_TAG}
 
 **Notes:**
 - ImageTag generation uses repository root git information
+- Sets `VERSIONER_IMAGETAG` environment variable for downstream use
 - Non-fatal errors (continues if git operations fail)
 - Case-insensitive branch name matching (`MASTER` = `master` = `Master`)
 - Branch names are trimmed (whitespace removed)
+
+---
+
+#### `--produceimagetag-only`
+
+**Description**: Standalone mode — generate Docker ImageTag and set the `VERSIONER_IMAGETAG` environment variable, then exit immediately. No file versioning is performed.
+
+**Purpose**: Quickly obtain an ImageTag for CI/CD pipelines without running the full versioning process.
+
+**Default value**: `false` (disabled)
+
+**Allowed parameters**: Only `-w` (`--workingfolder`) is permitted alongside this flag. Any other parameter causes an immediate exit with code **406**.
+
+**Usage:**
+```bash
+# Generate ImageTag only (short form)
+versioner --produceimagetag-only -w /path/to/repo
+
+# Generate ImageTag only (long form)
+versioner --produceimagetag-only --workingfolder=/path/to/repo
+```
+
+**Behavior:**
+1. Validates that no parameters other than `-w` are present (exit 406 if violated)
+2. Validates that `-w` is provided (exit 406 if missing)
+3. Resolves the git repository root from the working folder
+4. Generates ImageTag using the same logic as `--produceimagetag`
+5. Sets the environment variable `VERSIONER_IMAGETAG` to the generated tag
+6. Prints the ImageTag to stdout
+7. Exits with code **0** (success) — no version files are created or modified
+
+**Output:**
+```
+ImageTag: FB_REV_20260219_1437_b1ce59f
+Environment variable VERSIONER_IMAGETAG set to: FB_REV_20260219_1437_b1ce59f
+```
+
+**Exit Codes:**
+| Code | Meaning |
+|------|---------|
+| 0 | Success — ImageTag generated and environment variable set |
+| 1 | Error — git operations failed (invalid path, not a repository, etc.) |
+| 406 | Parameter violation — forbidden parameters used or `-w` missing |
+
+**Examples:**
+
+*Basic usage:*
+```bash
+versioner --produceimagetag-only -w .
+
+# Output:
+# ImageTag: FB_REV_20260219_1058_b1f60c67
+# Environment variable VERSIONER_IMAGETAG set to: FB_REV_20260219_1058_b1f60c67
+```
+
+*CI/CD pipeline — use ImageTag directly:*
+```bash
+# Generate tag and capture from environment variable
+versioner --produceimagetag-only -w .
+docker build -t myapp:$VERSIONER_IMAGETAG .
+docker push myapp:$VERSIONER_IMAGETAG
+```
+
+*Invalid usage (rejected with exit 406):*
+```bash
+# ERROR: -s is not allowed with --produceimagetag-only
+versioner --produceimagetag-only -w . -s
+
+# ERROR: -m is not allowed with --produceimagetag-only
+versioner --produceimagetag-only -w . -m
+
+# ERROR: missing -w
+versioner --produceimagetag-only
+```
+
+**Differences from `--produceimagetag`:**
+
+| Feature | `--produceimagetag` | `--produceimagetag-only` |
+|---------|---------------------|--------------------------|
+| Generates ImageTag | Yes | Yes |
+| Sets `VERSIONER_IMAGETAG` env var | Yes | Yes |
+| Performs file versioning | Yes (if other params set) | Never |
+| Allows other parameters | Yes | Only `-w` |
+| Output format | TeamCity service message | Plain text |
+
+**Notes:**
+- Uses the same ImageTag generation logic as `--produceimagetag` (branch prefix + date + commit hash)
+- The environment variable is set in the current process scope
+- No `version.txt` files are created or modified
+- No project files (.csproj, package.json, etc.) are touched
 
 ---
 
