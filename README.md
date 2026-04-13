@@ -1326,6 +1326,7 @@ versioner -w . -s -g -f /path/to/projectguids.json
 
 **Supported types:**
 - `dotnet` - .csproj files
+- `props` - .props files (e.g., Directory.Build.props)
 - `nuget` - .nuspec files
 - `npm` - package.json files
 - `docker` - Dockerfile, docker-compose.yml
@@ -1367,6 +1368,25 @@ versioner -w . -s --versionitems="dotnet,docker"
 
 # Result: .csproj and Dockerfile versioned, package.json and Chart.yaml untouched
 ```
+
+---
+
+#### `--versiononlyprops` / `-n`
+
+**Description**: Version only `.props` files, skip `.csproj`.
+
+**Purpose**: Central version management via `Directory.Build.props`. When enabled, Versioner writes the calculated version to `.props` files instead of `.csproj` files. All `.csproj` files then inherit the version from `Directory.Build.props` via MSBuild.
+
+**Usage:**
+```bash
+# Version only Directory.Build.props, leave .csproj untouched
+versioner -w . -s -n
+
+# Combine with other flags
+versioner -w . -s -n -l I
+```
+
+**Default**: `false` (version `.csproj` files, use `.props` as read-only base)
 
 ---
 
