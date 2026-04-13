@@ -54,16 +54,19 @@ Versioner automatically generates semantic versions based on:
 ### Two Operating Modes
 1. **Classic Mode** (default): Each artifact gets its own independent version
    - Version calculated from artifact's directory commit history
-   - Perfect for multi-project repositories where components evolve independently
-   - Each component has its own version lifecycle
+   - If `Directory.Build.props` has a version, it serves as read-only base (Major/Minor preserved for all `.csproj`)
+   - If no `.props`, each `.csproj` preserves its own Major/Minor from its existing `<Version>` tag
+   - If no version exists in a file, all segments are calculated from the algorithm
 
 2. **MonoRepo Mode** (`-m`): All artifacts share one global version
    - Version calculated from repository root commit history
-   - Ideal for unified release cycles where all components release together
-   - "Preserve Major" logic maintains consistency across artifacts
+   - Base version priority: `Directory.Build.props` > highest version from `.csproj` files > full calculation
+   - Major/Minor from the base are preserved; Patch and Hotfix are calculated
+   - One version is written to ALL versioned files
+   - `Directory.Build.props` is never modified (read-only base)
 
 ### Multi-Platform Support
-- **.NET**: `.csproj`, `.props`, `.nuspec`, `AssemblyInfo.cs`
+- **.NET**: `.csproj`, `.nuspec`, `AssemblyInfo.cs` (`Directory.Build.props` is a read-only version base, never modified)
 - **Docker**: `Dockerfile`, `docker-compose.yml`
 - **JavaScript/TypeScript**: `package.json`
 - **Python**: `setup.py`, `pyproject.toml`, `__init__.py`
@@ -224,62 +227,45 @@ In Classic Mode, each artifact is versioned **independently** based on its direc
 - CLI `--definedpatch` sets the **W (Build)** component, NOT Z (Patch)
 - This is the **highest priority** override - it ignores all other sources for W component
 
-### MonoRepo Mode - Version Calculation
+### Version Preservation Logic
 
-In MonoRepo Mode, all artifacts share **one global version** calculated from repository root.
+Versioner respects existing version values in project files. The rules apply to **both Classic and MonoRepo modes**.
 
-#### Key Differences from Classic Mode:
+#### Preservation Rules (X.Y.Z.W = Major.Minor.Patch.Hotfix):
 
-1. **"Preserve Major" Logic** applies:
-   - Looks for existing Major version in `.props` files first
-   - Falls back to first `.csproj` file if no `.props` has version
-   - Preserves that Major for all artifacts
+| Existing version in file | Behavior |
+|---|---|
+| `1.0.0.0` (all segments numeric) | Preserve Major=1, Minor=0; calculate Patch+Hotfix |
+| `1.2.0.0` (Major+Minor numeric) | Preserve Major=1, Minor=2; calculate Patch+Hotfix |
+| `1.*.*.*` (Major numeric, rest `*`) | Preserve Major=1; calculate Minor+Patch+Hotfix |
+| `*.*.*.*` or no version | Calculate all 4 segments from algorithm |
 
-2. **Only global `ProjectOverride.json` applies**:
-   - Local overrides in artifact directories are ignored
-   - Repository root `/ProjectOverride.json` is the only override file used
+#### Priority Chain:
+```
+ProjectOverride.json > Directory.Build.props > .csproj own version > full algorithm
+```
 
-3. **Commit count from repository root**:
-   ```bash
-   # For ALL artifacts in MonoRepo mode:
-   git log --oneline | wc -l
-   # → 114 commits in entire repository
-   ```
+#### Classic Mode — Base Version Resolution:
 
-#### "Preserve Major" Logic (MonoRepo Only):
+1. If `Directory.Build.props` has `<Version>` → used as read-only base for ALL `.csproj` files
+   - Major/Minor from `.props` are preserved in every `.csproj`
+   - Patch (Z=dayOfYear) and Hotfix (W=commitCount) calculated per `.csproj` directory
+2. If no `.props` → each `.csproj` uses its own `<Version>` for preservation
+3. If a `.csproj` has no version → all 4 segments calculated from algorithm
+4. `Directory.Build.props` is **never modified**
 
-**Search Order:**
-1. **PRIORITY 1**: Check `Directory.Build.props` for `<Version>` tag
-   ```xml
-   <!-- If exists, Major=5 is preserved for ALL artifacts -->
-   <Project>
-     <PropertyGroup>
-       <Version>5.0.0</Version>
-     </PropertyGroup>
-   </Project>
-   ```
+#### MonoRepo Mode — Base Version Resolution:
 
-2. **PRIORITY 2**: If no .props version, check first `.csproj` file
-   ```xml
-   <!-- Cli/Versioner.Cli.csproj -->
-   <Project>
-     <PropertyGroup>
-       <Version>1.1.19.30</Version>  <!-- Major=1 preserved -->
-     </PropertyGroup>
-   </Project>
-   ```
+1. **PRIORITY 1**: `Directory.Build.props` — if it has `<Version>`, use as base
+2. **PRIORITY 2**: Highest `<Version>` across all `.csproj` files in the repository
+3. **FALLBACK**: No base → calculate everything from repository root git history
+4. One version is calculated and written to **all** versioned files
+5. `Directory.Build.props` is **never modified** (read-only base)
 
-3. **OVERRIDE**: `ProjectOverride.json` can override preserved Major
-   ```json
-   // /ProjectOverride.json
-   { "Major": 2, "Minor": 0, "Patch": 0, "Hotfix": 0 }
-   // Forces Major=2 for all artifacts, overriding preserved value
-   ```
-
-**Why "Preserve Major"?**
-- In MonoRepo mode, you typically want version consistency
-- If you've already established a major version (e.g., v5.x.x), preserve it
-- Prevents major version from recalculating each year
+**Why preserve Major/Minor?**
+- Maintains version consistency when a project has an established version line (e.g., v5.x.x)
+- Prevents Major from being recalculated each year when it was intentionally set
+- Allows teams to control their version scheme via `Directory.Build.props` or per-project `<Version>`
 
 ### Commit Counting Logic
 
@@ -376,7 +362,7 @@ Core artifact:
   Result: 28.2601.023.59
 ```
 
-#### Example 3: MonoRepo Mode, "Preserve Major"
+#### Example 3: MonoRepo Mode, Version Preservation
 
 **Setup:**
 - Date: January 23, 2026
@@ -1339,7 +1325,7 @@ versioner -w . -s -g -f /path/to/projectguids.json
 **Purpose**: Selectively version only specific artifact types, ignoring others.
 
 **Supported types:**
-- `dotnet` - .csproj, .props files
+- `dotnet` - .csproj files
 - `nuget` - .nuspec files
 - `npm` - package.json files
 - `docker` - Dockerfile, docker-compose.yml
@@ -1349,7 +1335,6 @@ versioner -w . -s -g -f /path/to/projectguids.json
 - `java` - pom.xml, build.gradle files
 - `helm` - Chart.yaml files
 - `yaml` - YAML manifest files
-- `props` - .props files (when used separately from dotnet)
 
 **Usage:**
 ```bash
@@ -1682,7 +1667,7 @@ versioner -w . -s --versionitems="dotnet" -l I
 ```
 
 **What happens:**
-- Only `.csproj` and `.props` files versioned
+- Only `.csproj` files versioned
 - Skips `package.json`, `Dockerfile`, etc.
 
 ---
@@ -1798,7 +1783,7 @@ Core/Versioner.csproj     → 2.2601.023.59
 
 ### .NET Projects
 
-**Files**: `.csproj`, `.props`, `.nuspec`, `AssemblyInfo.cs`
+**Files**: `.csproj`, `.nuspec`, `AssemblyInfo.cs` (`Directory.Build.props` is read-only version base)
 
 **Version Properties Updated:**
 ```xml
